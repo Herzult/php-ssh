@@ -1,0 +1,12 @@
+<?php
+
+require_once __DIR__.'/../src/ClassLoader/UniversalClassLoader.php';
+
+use ClassLoader\UniversalClassLoader;
+
+$loader = new UniversalClassLoader();
+$loader->registerNamespaces(array(
+    'Ssh' => __DIR__.'/../src'
+));
+
+$loader->register();
