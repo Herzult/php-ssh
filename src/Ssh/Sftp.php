@@ -125,6 +125,82 @@ class Sftp extends Subsystem
     }
 
     /**
+     * Indicates whether the specified distant file exists
+     *
+     * @param  string $filename The distant filename
+     *
+     * @return boolean
+     */
+    public function exists($filename)
+    {
+        return file_exists($this->getUrl($filename));
+    }
+
+    /**
+     * Reads the content of the specified remote file
+     *
+     * @param  string $filename The remote filename
+     *
+     * @return string
+     */
+    public function read($filename)
+    {
+        return file_get_contents($this->getUrl($filename));
+    }
+
+    /**
+     * Writes the given content to the specified remote file
+     *
+     * @param  string $filename The remote filename
+     *
+     * @return integer The number of bytes that were written into the file, or
+     *                 FALSE on failure
+     */
+    public function write($filename, $content)
+    {
+        return file_put_contents($this->getUrl($filename), $content);
+    }
+
+    /**
+     * Receive the specified distant file as the specified local file
+     *
+     * @param  string $distant The distant filename
+     * @param  string $local   The local filename
+     *
+     * @return boolean TRUE on success, or FALSE on failure
+     */
+    public function receive($distant, $local)
+    {
+        return file_put_contents($local, $this->read($distant));
+    }
+
+    /**
+     * Sends the specified local file as the specified remote file
+     *
+     * @param  string $local   The local filename
+     * @param  string $distant The distant filename
+     *
+     * @return boolean TRUE on success, or FALSE on failure
+     */
+    public function send($local, $distant)
+    {
+        $this->write($distant, file_get_contents($local));
+    }
+
+    /**
+     * Returns the URL of the specified file with the ssh2.sftp protocol. The
+     * result URL is suitable for stream resource creation (e.g using fopen)
+     *
+     * @param  string $filename The distant filename
+     *
+     * @return string
+     */
+    public function getUrl($filename)
+    {
+        return sprintf('ssh2.sftp://%s/%s', $this->getResource(), $filename);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function createResource()
