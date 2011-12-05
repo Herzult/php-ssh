@@ -234,16 +234,20 @@ class Sftp extends Subsystem
     public function listDirectory($directory, $includeSubdirectories = true)
     {
         $url = $this->getUrl($directory);
+        $contents = array(
+            'keys' => array(),
+            'dirs' => array()
+        );
 
-        $contents = array();
-        foreach ($this->scanUrl($url) as $file) {
+        $files = $this->scanUrl($url);
+        foreach ($files as $file) {
             if (true === $includeSubdirectories
                 && $subFiles = $this->scanUrl("$url/$file")) {
                 foreach ($subFiles as $subFile) {
-                    $contents[] = "$directory/$file/$subFile";
+                    $contents['keys'][] = "$directory/$file/$subFile";
                 }
             } else {
-                $contents[] = "$directory/$file";
+                $contents['keys'][] = "$directory/$file";
             }
         }
 
