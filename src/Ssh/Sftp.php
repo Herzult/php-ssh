@@ -201,6 +201,60 @@ class Sftp extends Subsystem
     }
 
     /**
+     * Scan a URL for files and directories
+     *
+     * Unfortunately, using a (recursive) directory iterator is not possible
+     * over SFTP: see https://bugs.php.net/bug.php?id=57378. Also, is_dir() is
+     * unreliable and often returns false for valid directories. Therefore, I
+     * use @scandir() instead.
+     *
+     * @param string $url
+     * @return array
+     */
+    protected function scanUrl($url)
+    {
+        if (!$files = @scandir($url)) {
+            return null;
+        }
+
+        return array_filter($files, function($file) {
+            if ($file != '.' && $file != '..') {
+                return true;
+            }
+        });
+    }
+
+    /**
+     * List files and directories in a directory
+     *
+     * @param string $directory
+     * @param boolean $includeSubdirectories
+     * @return array
+     */
+    public function listDirectory($directory, $includeSubdirectories = true)
+    {
+        $url = $this->getUrl($directory);
+        $contents = array(
+            'keys' => array(),
+            'dirs' => array()
+        );
+
+        $files = $this->scanUrl($url);
+        foreach ($files as $file) {
+            if (true === $includeSubdirectories
+                && $subFiles = $this->scanUrl("$url/$file")) {
+                foreach ($subFiles as $subFile) {
+                    $contents['keys'][] = "$directory/$file/$subFile";
+                }
+            } else {
+                $contents['keys'][] = "$directory/$file";
+            }
+        }
+
+        return $contents;
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function createResource()
