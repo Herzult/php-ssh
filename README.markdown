@@ -33,6 +33,14 @@ Here is an exemple of how to use it:
 
     $loader->register();
 
+Installation (via composer)
+------------
+
+Download [composer](http://getcomposer.org/download/).
+Install php-ssh using composer:
+
+    $ php composer.phar install
+
 Usage
 -----
 
