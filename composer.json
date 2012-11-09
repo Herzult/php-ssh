@@ -1,0 +1,26 @@
+{
+    "name":         "herzult/php-ssh",
+    "type":         "library",
+    "description":  "Provides an object-oriented wrapper for the php ssh2 extension.",
+    "keywords":     ["ssh", "ssh2"],
+    "license":      "MIT",
+    "authors": [
+        {
+            "name": "Antoine Hérault",
+            "homepage": "https://github.com/Herzult"
+        },
+        {
+            "name":     "The contributors",
+            "homepage": "http://github.com/Herzult/php-ssh/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "ext-ssh2": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Ssh": "src/"
+        }
+    }
+}
