@@ -39,7 +39,7 @@ class Publickey extends Subsystem
      *               associative array containing: name, blob, and attrs
      *               elements.
      */
-    public function list()
+    public function getList()
     {
         return ssh2_publickey_list($this->getResource());
     }
