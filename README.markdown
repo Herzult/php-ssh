@@ -82,6 +82,7 @@ The available authentication are:
  - `Password` for password authentication
  - `PublicKeyFile` to authenticate using a public key
  - `HostBasedFile` to authenticate using a public hostkey
+ - `Agent` to authenticate using an ssh-agent
 
 ### Subsystems
 
