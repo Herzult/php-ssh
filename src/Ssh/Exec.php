@@ -48,6 +48,6 @@ class Exec extends Subsystem
 
     public function getError()
     {
-        return stream_get_contents(ssh2_fetch_stream($this->resource, SSH2_STREAM_STDERR));
+        return stream_get_contents(ssh2_fetch_stream($this->getResource(), SSH2_STREAM_STDERR));
     }
 }
