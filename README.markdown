@@ -113,7 +113,7 @@ See the `Ssh\Publickey` class for more details on the available methods.
 
 #### Exec
 
-The session provide the `getExec($cmd)` method to access exec subsystem
+The session provides the `getExec($cmd)` method to access the exec subsystem
 
     <?php
 
