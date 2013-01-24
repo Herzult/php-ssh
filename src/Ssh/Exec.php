@@ -1,14 +1,13 @@
 <?php
 
-namespace Exec;
-
-use RuntimeException;
+namespace Ssh;
 
 /**
  * Remote command execution via ssh
  *
  * @author Greg Militello <junk@thinkof.net>
  */
+
 class Exec extends Subsystem
 {
     /**
@@ -22,20 +21,17 @@ class Exec extends Subsystem
     {
         $stream = ssh2_exec($this->getResource(), $command);
         
-        $err_stream = ssh2_fetch_stream($stdout_stream, SSH2_STREAM_STDERR);
+        //$errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+        //stream_set_blocking($errStream, true);
+        stream_set_blocking($stream, true);
+        //$resultErr = stream_get_contents($errStream);
+        $resultDio = stream_get_contents($stream);
 
-        $dio_stream = ssh2_fetch_stream($stdout_stream, SSH2_STREAM_STDDIO);
+        return $resultDio;
+    }
 
-        stream_set_blocking($err_stream, true);
-        stream_set_blocking($dio_stream, true);
-
-        $result_err = stream_get_contents($err_stream));
-        $result_dio = stream_get_contents($dio_stream));
-        
-        echo "\nError:\n\n";
-        print_r ($result_err);
-        echo "\nResult:\n\n";
-        print_r ($result_dio);
-        echo "\n\n\n";
+    protected function createResource()
+    {
+        $this->resource = $this->getSessionResource();
     }
 }
