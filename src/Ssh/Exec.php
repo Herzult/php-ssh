@@ -20,11 +20,7 @@ class Exec extends Subsystem
     public function run($command)
     {
         $stream = ssh2_exec($this->getResource(), $command);
-        
-        //$errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
-        //stream_set_blocking($errStream, true);
         stream_set_blocking($stream, true);
-        //$resultErr = stream_get_contents($errStream);
         $resultDio = stream_get_contents($stream);
 
         return $resultDio;
