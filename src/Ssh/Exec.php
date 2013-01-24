@@ -2,8 +2,6 @@
 
 namespace Ssh;
 
-use RuntimeException;
-
 /**
  * Wrapper for ssh2_exec
  *
