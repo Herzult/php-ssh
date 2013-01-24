@@ -8,46 +8,30 @@ use RuntimeException;
  * Wrapper for ssh2_exec
  *
  * @author Cam Spiers <camspiers@gmail.com>
+ * @author Greg Militello <junk@thinkof.net>
  */
 class Exec extends Subsystem
 {
-    protected $cmd;
-    protected $pty;
-    protected $env;
-    protected $width;
-    protected $height;
-    protected $width_height_type;
-
-    public function __construct($session, $cmd, $pty = false, $env = null, $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
-    {
-        parent::__construct($session);
-        $this->cmd = $cmd;
-        $this->pty = $pty;
-        $this->env = $env;
-        $this->width = $width;
-        $this->height = $height;
-        $this->width_height_type = $width_height_type;
-    }
+    protected $stream;
 
     protected function createResource()
     {
-        $stream = ssh2_exec($this->getSessionResource(), $this->cmd, $this->pty, $this->env, $this->width, $this->height, $this->width_height_type);
-        stream_set_blocking($stream, true);
-
-        if (!is_resource($stream)) {
-            throw new RuntimeException('The initialization of the Exec subsystem failed.');
-        }
-
-        $this->resource = $stream;
+        $this->resource = $this->getSessionResource();
     }
 
-    public function run()
+    public function run($cmd, $pty = false, $env = null, $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
     {
-        return stream_get_contents($this->getResource());
+        $this->stream = ssh2_exec($this->getResource(), $cmd, $pty, $env, $width, $height, $width_height_type);
+        stream_set_blocking($this->stream, true);
+        return stream_get_contents($this->stream);
     }
 
     public function getError()
     {
-        return stream_get_contents(ssh2_fetch_stream($this->getResource(), SSH2_STREAM_STDERR));
+        if (is_resource($this->stream)) {
+            return stream_get_contents(ssh2_fetch_stream($this->stream, SSH2_STREAM_STDERR));
+        } else {
+            return false;
+        }
     }
 }
