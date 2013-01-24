@@ -113,15 +113,15 @@ See the `Ssh\Publickey` class for more details on the available methods.
 
 #### Exec
 
-The session provides the `getExec($cmd)` method to access the exec subsystem
+The session provides the `getExec()` method to access the exec subsystem
 
     <?php
 
     // ... the session creation
 
-    $exec = $session->getExec('ls -lah');
+    $exec = $session->getExec();
 
-    echo $exec->run();
+    echo $exec->run('ls -lah');
     echo $exec->getError();
 
 See the `Ssh\Exec` class for more details.
