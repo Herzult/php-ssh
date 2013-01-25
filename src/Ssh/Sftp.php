@@ -121,7 +121,7 @@ class Sftp extends Subsystem
      */
     public function unlink($filename)
     {
-        return ssh2_sftp_symlink($this->getResource(), $filename);
+        return ssh2_sftp_unlink($this->getResource(), $filename);
     }
 
     /**
