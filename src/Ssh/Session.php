@@ -137,7 +137,7 @@ class Session extends AbstractResourceHolder
      */
     protected function connect(array $arguments)
     {
-        return call_user_func_array('ssh2_connect', $this->configuration->asArguments());
+        return call_user_func_array('ssh2_connect', $arguments);
     }
 
     /**
