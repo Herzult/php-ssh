@@ -54,6 +54,19 @@ For that, create a Configuration instance with all the needed parameters.
     // simple configuration to connect "my-host"
     $configuration = new Ssh\Configuration('my-host');
 
+The availble configration classes are:
+
+- `Configuration`
+- `SshConfigFileConfiguration`
+
+Both connection configuration and public/private key authetication can be obtained from a ssh config file such as `~/.ssh/config`
+
+    <?php
+
+    // simple configuration to connect "my-host"
+    $configuration = new Ssh\SshConfigFileConfiguration('/Users/username/.ssh/config', 'my-host');
+    $authentication = $configuration->getAuthentication('optional_passphrase', 'optional_username');
+
 ### Create a session
 
 The session is the central access point to the SSH functionality provided by the library.
@@ -82,6 +95,18 @@ The available authentication are:
  - `Password` for password authentication
  - `PublicKeyFile` to authenticate using a public key
  - `HostBasedFile` to authenticate using a public hostkey
+
+### Authentication from SshConfigFileConfiguration
+
+If you use an ssh config file you can load your authentication and configuration from it as follows:
+
+    <?php
+
+    $configuration = new Ssh\SshConfigFileConfiguration('~/.ssh/config', 'my-host');
+
+    $session = new Session($configuration, $configuration->getAuthentication());
+
+This will pick up your public and private keys from your config file Host and Identity declarations.
 
 ### Subsystems
 
