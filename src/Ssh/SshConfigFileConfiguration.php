@@ -15,7 +15,6 @@ class SshConfigFileConfiguration extends Configuration
     protected $configs = array();
     protected $config;
     protected $match = array();
-    protected $user;
 
     /**
      * Constructor
@@ -59,6 +58,7 @@ class SshConfigFileConfiguration extends Configuration
         }
         $contents = file_get_contents($file);
         $configs = array();
+        $lineNumber = 1;
         foreach (explode(PHP_EOL, $contents) as $line) {
             if (trim($line) == '' || $line[0] == '#') {
                 continue;
@@ -76,8 +76,7 @@ class SshConfigFileConfiguration extends Configuration
                     $i++;
                 }
                 if ($i == strlen($line)) {
-                    $i++;
-                    throw new RuntimeException("The file '$file' is not parsable at line '$i'");
+                    throw new RuntimeException("The file '$file' is not parsable at line '$lineNumber'");
                 }
                 $key = strtolower(trim(substr($line, 0, $i)));
                 $value = trim(substr($line, $i + 1, strlen($line)));
@@ -95,7 +94,9 @@ class SshConfigFileConfiguration extends Configuration
                     $configs[$host][$key] = $value;
                 }
             }
+            $lineNumber++;
         }
+        $this->configs = array_merge($this->configs, $configs);
     }
 
     /**
@@ -112,10 +113,10 @@ class SshConfigFileConfiguration extends Configuration
             }
         }
         if (count($matches) == 0) {
-            throw new RuntimeException("Unable to find configuration for host '{$this->host}'");
+            throw new RuntimeException("Unable to find configuration for host '{$host}'");
         }
         usort($matches, function ($a, $b) {
-            return strlen($a['host']) > $b['host'];
+            return strlen($a['host']) < $b['host'];
         });
         $result = array();
         foreach ($matches as $match) {
