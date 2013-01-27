@@ -1,7 +1,7 @@
 PHP SSH
 =======
 
-[![Build Status](https://travis-ci.org/Herzult/php-ssh.png)](https://travis-ci.org/Herzult/php-ssh)
+[![Build Status](https://travis-ci.org/Herzult/php-ssh.png?branch=master)](https://travis-ci.org/Herzult/php-ssh)
 
 Provides an object-oriented wrapper for the php ssh2 extension.
 
