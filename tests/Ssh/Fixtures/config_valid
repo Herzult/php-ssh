@@ -1,0 +1,24 @@
+Host hello hello.com
+HostName hello.com
+Port 1234
+
+#This is a comment which won't appear in the parsed array
+
+Host test
+HostName test.com
+
+Host testuser.com
+User test
+IdentityFile test
+
+Host = tamp
+HostName = tamp.yo
+
+Host identity
+User identity
+IdentityFile ~/identity
+
+Host ta*
+User bob
+Port = 12345
+HostName test.com
