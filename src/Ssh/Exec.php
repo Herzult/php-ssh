@@ -2,6 +2,8 @@
 
 namespace Ssh;
 
+use RuntimeException;
+
 /**
  * Wrapper for ssh2_exec
  *
@@ -10,8 +12,6 @@ namespace Ssh;
  */
 class Exec extends Subsystem
 {
-    protected $stream;
-
     protected function createResource()
     {
         $this->resource = $this->getSessionResource();
@@ -19,17 +19,14 @@ class Exec extends Subsystem
 
     public function run($cmd, $pty = false, $env = null, $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
     {
-        $this->stream = ssh2_exec($this->getResource(), $cmd, $pty, $env, $width, $height, $width_height_type);
-        stream_set_blocking($this->stream, true);
-        return stream_get_contents($this->stream);
-    }
-
-    public function getError()
-    {
-        if (is_resource($this->stream)) {
-            return stream_get_contents(ssh2_fetch_stream($this->stream, SSH2_STREAM_STDERR));
-        } else {
-            return false;
+        $stdout = ssh2_exec($this->getResource(), $cmd, $pty, $env, $width, $height, $width_height_type);
+        $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
+        stream_set_blocking($stderr, true);
+        stream_set_blocking($stdout, true);
+        $error = stream_get_contents($stderr);
+        if ($error !== '') {
+            throw new RuntimeException($error);
         }
+        return stream_get_contents($stdout);
     }
 }
