@@ -138,3 +138,19 @@ The session provides also the `getPublickey()` method to access the publickey su
     $publickey = $session->getPublickey();
 
 See the `Ssh\Publickey` class for more details on the available methods.
+
+#### Exec
+
+The session provides the `getExec()` method to access the exec subsystem
+
+    <?php
+
+    // ... the session creation
+
+    $exec = $session->getExec();
+
+    echo $exec->run('ls -lah');
+    echo $exec->getError();
+
+See the `Ssh\Exec` class for more details.
+
