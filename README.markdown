@@ -150,7 +150,6 @@ The session provides the `getExec()` method to access the exec subsystem
     $exec = $session->getExec();
 
     echo $exec->run('ls -lah');
-    echo $exec->getError();
 
 See the `Ssh\Exec` class for more details.
 
