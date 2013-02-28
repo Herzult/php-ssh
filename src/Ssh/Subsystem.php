@@ -22,7 +22,7 @@ abstract class Subsystem extends AbstractResourceHolder
     public function __construct($session)
     {
         if (!$session instanceof Session && !is_resource($session)) {
-            throw new InvalidArgumentException('The session must be either a Session instance or a SSH session resource.');
+            throw new \InvalidArgumentException('The session must be either a Session instance or a SSH session resource.');
         }
 
         $this->session = $session;
