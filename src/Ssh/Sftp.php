@@ -109,7 +109,7 @@ class Sftp extends Subsystem
      */
     public function symlink($target, $link)
     {
-        return ssh2_sftp_symlink($this->getResource(), $symlink, $link);
+        return ssh2_sftp_symlink($this->getResource(), $target, $link);
     }
 
     /**
