@@ -255,15 +255,21 @@ class Sftp extends Subsystem
      * unreliable and often returns false for valid directories. Therefore, I
      * use @scandir() instead.
      *
-     * @param  string  $directory
-     * @param  Boolean $recursive
+     * $dirCheck parameter is used internally and will let the method return directly
+     * after @scandir() is used.
      *
-     * @return array
+     * @param  string $directory
+     * @param  Boolean $recursive
+     * @param  Boolean $dirCheck
+     *
+     * @return array|Boolean
      */
-    private function scanDirectory($directory, $recursive)
+    private function scanDirectory($directory, $recursive = true, $dirCheck = false)
     {
         if (!$results = @scandir($this->getUrl($directory))) {
             return false;
+        } else if($dirCheck && !$recursive) {
+            return true;
         }
 
         $files       = array();
@@ -275,7 +281,7 @@ class Sftp extends Subsystem
             }
 
             $filename = sprintf('%s/%s', $directory, $result);
-            $children = $this->scanDirectory($filename, $recursive);
+            $children = $this->scanDirectory($filename, $recursive, !$recursive);
 
             if (false === $children) {
                 $files[] = $filename;
