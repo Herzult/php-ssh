@@ -184,7 +184,7 @@ class Sftp extends Subsystem
      */
     public function send($local, $distant)
     {
-        $this->write($distant, file_get_contents($local));
+        return $this->write($distant, file_get_contents($local));
     }
 
     /**

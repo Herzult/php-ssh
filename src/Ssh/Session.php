@@ -167,4 +167,12 @@ class Session extends AbstractResourceHolder
             throw new RuntimeException('The authentication over the current SSH connection failed.');
         }
     }
+    
+    /**
+     * @return Configuration
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
 }
