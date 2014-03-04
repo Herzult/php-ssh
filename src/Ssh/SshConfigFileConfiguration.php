@@ -116,7 +116,7 @@ class SshConfigFileConfiguration extends Configuration
             throw new RuntimeException("Unable to find configuration for host '{$host}'");
         }
         usort($matches, function ($a, $b) {
-            return strlen($a['host']) < $b['host'];
+            return strlen($a['host']) > strlen($b['host']);
         });
         $result = array();
         foreach ($matches as $match) {
