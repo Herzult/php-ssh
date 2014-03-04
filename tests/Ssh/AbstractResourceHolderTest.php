@@ -2,6 +2,9 @@
 
 namespace Ssh;
 
+/**
+ * @covers \Ssh\AbstractResourceHolder
+ */
 class AbstractResourceHolderTest extends \PHPUnit_Framework_TestCase
 {
     public function testResourceIsCreatedIfItDoesNotExist()
@@ -19,10 +22,12 @@ class AbstractResourceHolderTest extends \PHPUnit_Framework_TestCase
         $holder->expects($this->never())
             ->method('createResource');
 
+        $resource = tmpfile();
+
         $property = new \ReflectionProperty($holder, 'resource');
         $property->setAccessible(true);
-        $property->setValue($holder, tmpfile());
+        $property->setValue($holder, $resource);
 
-        $holder->getResource();
+        $this->assertEquals($resource, $holder->getResource());
     }
 }

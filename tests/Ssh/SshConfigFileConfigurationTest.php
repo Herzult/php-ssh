@@ -89,6 +89,9 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
         new SshConfigFileConfiguration('fakefile', 'test');
     }
 
+    /**
+     * @covers \Ssh\SshConfigFileConfiguration
+     */
     public function testGetAuthentication()
     {
         $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');

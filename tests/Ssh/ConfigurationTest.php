@@ -2,6 +2,9 @@
 
 namespace Ssh;
 
+/**
+ * @covers \Ssh\Configuration
+ */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function testDefaultPortIs22()
