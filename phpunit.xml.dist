@@ -22,4 +22,10 @@
             <directory>src/Ssh</directory>
         </whitelist>
     </filter>
+
+    <groups>
+        <exclude>
+            <group>functional</group>
+        </exclude>
+    </groups>
 </phpunit>
