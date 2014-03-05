@@ -13,7 +13,7 @@ before_script:
   - php -m | grep ssh2
   - composer self-update
   - composer install --dev
-  - echo `whoami`":1234" | chpasswd
+  - echo `whoami`":1234" | sudo chpasswd
 
 script:
   - phpunit --coverage-text
