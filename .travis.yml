@@ -12,6 +12,7 @@ matrix:
 
 before_script:
   - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
+  - sudo apt-get update -qq
   - pecl install -f ssh2-beta < .noninteractive
   - php -m | grep ssh2
   - composer self-update
