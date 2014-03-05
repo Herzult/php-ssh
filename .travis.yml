@@ -7,6 +7,7 @@ php:
   - 5.6
 
 before_script:
+  - sudo apt-get update
   - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
   - pecl install -f ssh2-beta < .noninteractive
   - php -m | grep ssh2
