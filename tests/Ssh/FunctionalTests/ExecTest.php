@@ -54,7 +54,7 @@ class ExecTest extends \PHPUnit_Framework_TestCase
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
-        $output = $exec->run('php -r \'fwrite(STDERR, "MessageOnStdErr");\'');
+        $output = $exec->run('echo "MessageOnStdErr" > /dev/stderr');
 
         $this->assertEquals('', trim($output));
     }
