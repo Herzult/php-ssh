@@ -12,10 +12,11 @@ use Ssh\Session;
  * @author Julius Beckmann
  *
  * @group functional
+ *
+ * @covers \Ssh\Exec
  */
 class ExecTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testExecuteWhoami()
     {
         $configuration = new Configuration('localhost');

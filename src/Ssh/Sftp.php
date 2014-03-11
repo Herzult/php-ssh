@@ -59,7 +59,8 @@ class Sftp extends Subsystem
      */
     public function realpath($filename)
     {
-        return ssh2_sftp_realpath($this->getResource(), $filename);
+        // This function creates a not documented warning on failure.
+        return @ssh2_sftp_realpath($this->getResource(), $filename);
     }
 
     /**
@@ -96,7 +97,8 @@ class Sftp extends Subsystem
      */
     public function stat($path)
     {
-        return ssh2_sftp_stat($this->getResource(), $path);
+        // This function creates a undocumented warning on missing files.
+        return @ssh2_sftp_stat($this->getResource(), $path);
     }
 
     /**
@@ -137,15 +139,17 @@ class Sftp extends Subsystem
     }
 
     /**
-     * Reads the content of the specified remote file
+     * Reads the content of the specified remote file.
+     * Will return false if file does not exist.
      *
      * @param  string $filename The remote filename
      *
-     * @return string
+     * @return string|false
      */
     public function read($filename)
     {
-        return file_get_contents($this->getUrl($filename));
+        // Suppress a warning, when file does not exist.
+        return @file_get_contents($this->getUrl($filename));
     }
 
     /**

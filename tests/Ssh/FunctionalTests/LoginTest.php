@@ -12,6 +12,9 @@ use Ssh\Session;
  * @author Julius Beckmann
  *
  * @group functional
+ *
+ * @covers \Ssh\Session
+ * @covers \Ssh\Authentication\Password
  */
 class LoginTest extends \PHPUnit_Framework_TestCase
 {
