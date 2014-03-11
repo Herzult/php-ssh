@@ -45,18 +45,16 @@ class ExecTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \RuntimeException MessageOnStdErr
      */
     public function testExecuteErrorOutput()
     {
-        $this->markTestSkipped('TODO: This does not seem to work. Cant find whats wrong.');
-
         $configuration = new Configuration('localhost');
         $authentication = new Password(TEST_USER, TEST_PASSWORD);
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
-        $output = $exec->run('cd /hom', true);
+        $output = $exec->run('php -r \'fwrite(STDERR, "MessageOnStdErr");\'');
 
         $this->assertEquals('', trim($output));
     }
