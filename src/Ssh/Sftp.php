@@ -275,14 +275,14 @@ class Sftp extends Subsystem
             }
 
             $filename = sprintf('%s/%s', $directory, $result);
-            $children = $this->scanDirectory($filename, $recursive);
 
-            if (false === $children) {
+            if (false === @scandir($this->getUrl($filename))) {
                 $files[] = $filename;
             } else {
                 $directories[] = $filename;
 
                 if ($recursive) {
+                    $children    = $this->scanDirectory($filename, $recursive);
                     $files       = array_merge($files, $children[0]);
                     $directories = array_merge($directories, $children[1]);
                 }
