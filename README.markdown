@@ -85,11 +85,13 @@ The available authentication are:
 
 If you use an ssh config file you can load your authentication and configuration from it as follows:
 
-    <?php
+```php
+<?php
 
-    $configuration = new Ssh\SshConfigFileConfiguration('~/.ssh/config', 'my-host');
+$configuration = new Ssh\SshConfigFileConfiguration('~/.ssh/config', 'my-host');
 
-    $session = new Session($configuration, $configuration->getAuthentication());
+$session = new Session($configuration, $configuration->getAuthentication());
+```
 
 This will pick up your public and private keys from your config file Host and Identity declarations.
 
@@ -129,7 +131,7 @@ See the `Ssh\Publickey` class for more details on the available methods.
 
 The session provides the `getExec()` method to access the exec subsystem
 
-```
+```php
 <?php
 
 // ... the session creation
