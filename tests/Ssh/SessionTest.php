@@ -2,6 +2,9 @@
 
 namespace Ssh;
 
+/**
+ * @covers \Ssh\Session
+ */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
     protected $configuration;
@@ -84,5 +87,67 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('RuntimeException');
 
         $method->invoke($session);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The subsystem 'does_not_exist' is not supported.
+     */
+    public function testCreateInvalidSubsystem()
+    {
+        $session = new Session($this->configuration);
+
+        $session->getSubsystem('does_not_exist');
+    }
+
+    public function testGetConfiguration()
+    {
+        $session = new Session($this->configuration);
+
+        $this->assertEquals($this->configuration, $session->getConfiguration());
+    }
+
+    public function testGetSubsystemSftp()
+    {
+        $session = new Session($this->configuration);
+
+        $this->assertInstanceOf('\Ssh\Sftp', $session->getSftp());
+    }
+
+    public function testGetSubsystemPublickey()
+    {
+        $session = new Session($this->configuration);
+
+        $this->assertInstanceOf('\Ssh\Publickey', $session->getPublickey());
+    }
+
+    public function testGetSubsystemExec()
+    {
+        $session = new Session($this->configuration);
+
+        $this->assertInstanceOf('\Ssh\Exec', $session->getExec());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The authentication over the current SSH connection failed.
+     */
+    public function testAuthenficationException()
+    {
+        // A Authentication that will always fail.
+        $authentication = $this->getMock('Ssh\Authentication\Password', array(), array('John', 's3cr3t'));
+        $authentication->expects($this->once())
+                       ->method('authenticate')
+                       ->will($this->returnValue(false));
+
+        $session = new Session($this->configuration);
+
+        // We need to inject a resource, to trigger the authentification.
+        $resource = tmpfile();
+        $property = new \ReflectionProperty($session, 'resource');
+        $property->setAccessible(true);
+        $property->setValue($session, $resource);
+
+        $session->setAuthentication($authentication);
     }
 }

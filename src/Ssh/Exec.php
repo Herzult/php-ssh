@@ -17,7 +17,7 @@ class Exec extends Subsystem
         $this->resource = $this->getSessionResource();
     }
 
-    public function run($cmd, $pty = false, $env = null, $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
+    public function run($cmd, $pty = null, array $env = array(), $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
     {
         $stdout = ssh2_exec($this->getResource(), $cmd, $pty, $env, $width, $height, $width_height_type);
         $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
