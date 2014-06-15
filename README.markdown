@@ -42,7 +42,7 @@ Installation (via composer)
 Download [composer](http://getcomposer.org/download/).
 Install php-ssh using composer:
 
-    $ php composer.phar install
+    $ php composer.phar require herzult/php-ssh:~1.0
 
 Usage
 -----
