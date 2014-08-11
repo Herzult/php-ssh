@@ -287,8 +287,10 @@ class Sftp extends Subsystem
 
                 if ($recursive) {
                     $children    = $this->scanDirectory($filename, $recursive);
-                    $files       = array_merge($files, $children[0]);
-                    $directories = array_merge($directories, $children[1]);
+                    if(false !== $children) {
+                        $files       = array_merge($files, $children[0]);
+                        $directories = array_merge($directories, $children[1]);
+                    }
                 }
             }
         }
