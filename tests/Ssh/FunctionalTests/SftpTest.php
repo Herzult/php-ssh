@@ -59,6 +59,8 @@ class SftpTest extends \PHPUnit_Framework_TestCase
         $fs->mkdir($this->tmpDir . '/bar');
         $fs->mkdir($this->tmpDir . '/bar/alice');
         $fs->dumpFile($this->tmpDir . '/bar/bob.txt', 'SomeContent');
+
+        $fs->chmod($this->tmpDir, 0777, 0000, true);
     }
 
     protected function createLargeDirectoryTree()
@@ -79,6 +81,7 @@ class SftpTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+        $fs->chmod($basePath, 0777, 0000, true);
     }
 
     public function testSymlinks()
@@ -184,8 +187,8 @@ class SftpTest extends \PHPUnit_Framework_TestCase
           array(
             'files' => array($path . '/bob.txt'),
             'directories' => array($path . '/alice'),
-          ),
-          $list
+            ),
+            $list
         );
     }
 

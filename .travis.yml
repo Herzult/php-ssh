@@ -16,5 +16,5 @@ before_script:
   - echo `whoami`":1234" | sudo chpasswd
 
 script:
-  - phpunit --coverage-text
-  - phpunit --group functional
+  - php vendor/bin/phpunit --coverage-text
+  - php vendor/bin/phpunit --group functional
