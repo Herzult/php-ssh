@@ -5,7 +5,7 @@ Port 1234
 #This is a comment which won't appear in the parsed array
 
 Host test
-HostName test.com
+    HostName test.com
 
 Host testuser.com
 User test

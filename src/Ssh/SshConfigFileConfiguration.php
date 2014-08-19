@@ -60,7 +60,8 @@ class SshConfigFileConfiguration extends Configuration
         $configs = array();
         $lineNumber = 1;
         foreach (explode(PHP_EOL, $contents) as $line) {
-            if (trim($line) == '' || $line[0] == '#') {
+            $line = trim($line);
+            if ($line == '' || $line[0] == '#') {
                 continue;
             }
             $pos = strpos($line, '=');
