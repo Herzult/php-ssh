@@ -44,7 +44,7 @@ class SshConfigFileConfiguration extends Configuration
      */
     protected function processPath($path)
     {
-        return str_replace('~', getenv('HOME'), $path);
+        return preg_replace('/^~/', getenv('HOME'), $path);
     }
 
     /**
