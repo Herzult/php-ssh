@@ -106,10 +106,11 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
                 null
             ), $config->getAuthentication(null, 'test'));
 
-            $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
         } else {
             $this->assertEquals(new Authentication\None('test'), $config->getAuthentication(null, 'test'));
         }
+
+        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
 
         $this->assertEquals(
             new Authentication\PublicKeyFile(
