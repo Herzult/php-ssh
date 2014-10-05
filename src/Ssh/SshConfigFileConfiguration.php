@@ -11,6 +11,7 @@ use RuntimeException;
  */
 class SshConfigFileConfiguration extends Configuration
 {
+    const DEFAULT_SSH_IDENTITY = '~/.ssh/id_rsa';
 
     protected $configs = array();
     protected $config;
@@ -126,7 +127,10 @@ class SshConfigFileConfiguration extends Configuration
         unset($result['host']);
         if (isset($result['identityfile'])) {
             $result['identityfile'] = $this->processPath($result['identityfile']);
+        } else if (file_exists($file = $this->processPath(self::DEFAULT_SSH_IDENTITY))) {
+            $result['identityfile'] = $file;
         }
+
         return $result;
     }
 
