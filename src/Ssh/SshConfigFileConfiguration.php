@@ -11,6 +11,7 @@ use RuntimeException;
  */
 class SshConfigFileConfiguration extends Configuration
 {
+
     const DEFAULT_SSH_IDENTITY = '~/.ssh/id_rsa';
 
     protected $configs = array();
@@ -19,15 +20,20 @@ class SshConfigFileConfiguration extends Configuration
 
     /**
      * Constructor
+     *
      * @param  string  $file
      * @param  string  $host
      * @param  integer $port
      * @param  array   $methods
      * @param  array   $callbacks
+     * @param  string  $itentity
      */
-    public function __construct($file, $host, $port = 22, array $methods = array(), array $callbacks = array())
+    public function __construct(
+        $file, $host, $port = 22, array $methods = array(), array $callbacks = array(), $itentity = null
+    )
     {
         $this->parseSshConfigFile($this->processPath($file));
+        $this->identity = !empty($identity) ? $identity : self::DEFAULT_SSH_IDENTITY;
         $this->config = $this->getConfigForHost($host);
 
         parent::__construct(
@@ -127,7 +133,7 @@ class SshConfigFileConfiguration extends Configuration
         unset($result['host']);
         if (isset($result['identityfile'])) {
             $result['identityfile'] = $this->processPath($result['identityfile']);
-        } else if (file_exists($file = $this->processPath(self::DEFAULT_SSH_IDENTITY))) {
+        } else if (file_exists($file = $this->processPath($this->getIdentity()))) {
             $result['identityfile'] = $file;
         }
 
