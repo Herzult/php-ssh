@@ -26,14 +26,14 @@ class SshConfigFileConfiguration extends Configuration
      * @param  integer $port
      * @param  array   $methods
      * @param  array   $callbacks
-     * @param  string  $itentity
+     * @param  string  $identity
      */
     public function __construct(
-        $file, $host, $port = 22, array $methods = array(), array $callbacks = array(), $itentity = null
+        $file, $host, $port = 22, array $methods = array(), array $callbacks = array(), $identity = null
     )
     {
         $this->parseSshConfigFile($this->processPath($file));
-        $this->identity = !empty($identity) ? $identity : self::DEFAULT_SSH_IDENTITY;
+        $this->identity = is_null($identity) ? self::DEFAULT_SSH_IDENTITY : $identity;
         $this->config = $this->getConfigForHost($host);
 
         parent::__construct(
