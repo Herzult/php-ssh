@@ -12,21 +12,28 @@ use RuntimeException;
 class SshConfigFileConfiguration extends Configuration
 {
 
+    const DEFAULT_SSH_IDENTITY = '~/.ssh/id_rsa';
+
     protected $configs = array();
     protected $config;
     protected $match = array();
 
     /**
      * Constructor
+     *
      * @param  string  $file
      * @param  string  $host
      * @param  integer $port
      * @param  array   $methods
      * @param  array   $callbacks
+     * @param  string  $identity
      */
-    public function __construct($file, $host, $port = 22, array $methods = array(), array $callbacks = array())
+    public function __construct(
+        $file, $host, $port = 22, array $methods = array(), array $callbacks = array(), $identity = null
+    )
     {
         $this->parseSshConfigFile($this->processPath($file));
+        $this->identity = is_null($identity) ? self::DEFAULT_SSH_IDENTITY : $identity;
         $this->config = $this->getConfigForHost($host);
 
         parent::__construct(
@@ -44,7 +51,7 @@ class SshConfigFileConfiguration extends Configuration
      */
     protected function processPath($path)
     {
-        return str_replace('~', getenv('HOME'), $path);
+        return preg_replace('/^~/', getenv('HOME'), $path);
     }
 
     /**
@@ -126,7 +133,10 @@ class SshConfigFileConfiguration extends Configuration
         unset($result['host']);
         if (isset($result['identityfile'])) {
             $result['identityfile'] = $this->processPath($result['identityfile']);
+        } else if (file_exists($file = $this->processPath($this->getIdentity()))) {
+            $result['identityfile'] = $file;
         }
+
         return $result;
     }
 

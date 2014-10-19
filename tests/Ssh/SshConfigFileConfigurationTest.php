@@ -96,7 +96,19 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
 
-        $this->assertEquals(new Authentication\None('test'), $config->getAuthentication(null, 'test'));
+        $identity = getenv('HOME') . "/.ssh/id_rsa";
+
+        if (file_exists($identity)) {
+            $this->assertEquals(new Authentication\PublicKeyFile(
+                'test',
+                "{$identity}.pub",
+                $identity,
+                null
+            ), $config->getAuthentication(null, 'test'));
+
+        } else {
+            $this->assertEquals(new Authentication\None('test'), $config->getAuthentication(null, 'test'));
+        }
 
         $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
 

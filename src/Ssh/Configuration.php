@@ -13,6 +13,7 @@ class Configuration
     protected $port;
     protected $methods;
     protected $callbacks;
+    protected $identity;
 
     /**
      * Constructor
@@ -21,13 +22,15 @@ class Configuration
      * @param  integer $port
      * @param  array   $methods
      * @param  array   $callbacks
+     * @param  string  $identity
      */
-    public function __construct($host, $port = 22, array $methods = array(), array $callbacks = array())
+    public function __construct($host, $port = 22, array $methods = array(), array $callbacks = array(), $identity = null)
     {
         $this->host      = $host;
         $this->port      = $port;
         $this->methods   = $methods;
         $this->callbacks = $callbacks;
+        $this->identity  = $identity;
     }
 
     /**
@@ -123,5 +126,21 @@ class Configuration
             $this->methods,
             $this->callbacks
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentity()
+    {
+        return $this->identity;
+    }
+
+    /**
+     * @param string $identity
+     */
+    public function setIdentity($identity)
+    {
+        $this->identity = $identity;
     }
 }
