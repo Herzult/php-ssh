@@ -184,7 +184,8 @@ class Sftp extends Subsystem
      * @param  string $local   The local filename
      * @param  string $distant The distant filename
      *
-     * @return boolean TRUE on success, or FALSE on failure
+     * @return integer|false The number of bytes that were sent,
+     *                       or FALSE on failure
      */
     public function send($local, $distant)
     {
