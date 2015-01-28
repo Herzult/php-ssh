@@ -22,7 +22,7 @@ Usage
 
 ### Configuration of the connection
 
-To etablish an SSH connection, you must firt define its configuration.
+To establish an SSH connection, you must first define its configuration.
 For that, create a Configuration instance with all the needed parameters.
 
 ```php
@@ -32,12 +32,12 @@ For that, create a Configuration instance with all the needed parameters.
 $configuration = new Ssh\Configuration('my-host');
 ```
 
-The availble configration classes are:
+The available configuration classes are:
 
 - `Configuration`
 - `SshConfigFileConfiguration`
 
-Both connection configuration and public/private key authetication can be obtained from a ssh config file such as `~/.ssh/config`
+Both connection configuration and public/private key authentication can be obtained from a ssh config file such as `~/.ssh/config`
 
 ```php
 <?php
@@ -115,7 +115,7 @@ See the `Ssh\Sftp` class for more details on the available methods.
 
 #### Publickey
 
-The session provides also the `getPublickey()` method to access the publickey subsystem:
+The session also provides the `getPublickey()` method to access the publickey subsystem:
 
 ```php
 <?php
