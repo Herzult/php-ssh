@@ -45,7 +45,7 @@ class ExecTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException MessageOnStdErr
+     * @expectedException \RuntimeException
      */
     public function testExecuteErrorOutput()
     {
@@ -54,7 +54,7 @@ class ExecTest extends \PHPUnit_Framework_TestCase
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
-        $output = $exec->run('echo "MessageOnStdErr" > /dev/stderr');
+        $output = $exec->run('false');
 
         $this->assertEquals('', trim($output));
     }
