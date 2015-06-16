@@ -156,6 +156,7 @@ class Sftp extends Subsystem
      * Writes the given content to the specified remote file
      *
      * @param  string $filename The remote filename
+     * @param  string $content  The file content
      *
      * @return integer The number of bytes that were written into the file, or
      *                 FALSE on failure
