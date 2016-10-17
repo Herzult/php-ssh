@@ -29,7 +29,7 @@ class Exec extends Subsystem
         $output = stream_get_contents($stdout);
         preg_match('/\[return_code:(.*?)\]/', $output, $match);
         if ((int) $match[1] !== 0) {
-            throw new RuntimeException(stream_get_contents($stderr), (int) $match[1]);
+            throw new RuntimeException(stream_get_contents($stderr) . "\nLast output: " . $output, (int) $match[1]);
         }
 
         return preg_replace('/\[return_code:(.*?)\]/', '', $output);
