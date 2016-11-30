@@ -256,9 +256,7 @@ class Sftp extends Subsystem
      * Scans a directory
      *
      * Unfortunately, using a (recursive) directory iterator is not possible
-     * over SFTP: see https://bugs.php.net/bug.php?id=57378. Also, is_dir() is
-     * unreliable and often returns false for valid directories. Therefore, I
-     * use @scandir() instead.
+     * over SFTP: see https://bugs.php.net/bug.php?id=57378.
      *
      * @param  string  $directory
      * @param  Boolean $recursive
@@ -267,7 +265,8 @@ class Sftp extends Subsystem
      */
     private function scanDirectory($directory, $recursive)
     {
-        if (!$results = @scandir($this->getUrl($directory))) {
+        $url = $this->getUrl($directory);
+        if ( ! is_dir($url) || ! $results = scandir($url)) {
             return false;
         }
 
