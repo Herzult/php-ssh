@@ -239,7 +239,7 @@ class Sftp extends Subsystem
     }
 
     /**
-     * Creates a directory
+     * Change the access permissions to file system objects
      *
      * @see http://php.net/manual/en/function.ssh2-sftp-chmod.php
      *
