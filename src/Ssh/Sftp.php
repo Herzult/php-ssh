@@ -239,6 +239,21 @@ class Sftp extends Subsystem
     }
 
     /**
+     * Change the access permissions to file system objects
+     *
+     * @see http://php.net/manual/en/function.ssh2-sftp-chmod.php
+     *
+     * @param  string $filename The filename to resolve
+     * @param  int    $mod      The permissions on the new filename
+     *
+     * @return Boolean
+     */
+    public function chmod($filename, $mod = 0600)
+    {
+        return ssh2_sftp_chmod($this->getResource(), $filename, $mod);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function createResource()
