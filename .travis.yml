@@ -10,7 +10,7 @@ php:
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
-  - pecl install -f ssh2-beta < .noninteractive
+  - pecl install -f ssh2-1.0 < .noninteractive
   - php -m | grep ssh2
   - composer self-update
   - composer install --dev
