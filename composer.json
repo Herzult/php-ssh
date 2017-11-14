@@ -1,7 +1,7 @@
 {
-    "name":         "herzult/php-ssh",
+    "name":         "flavienaudin/php-ssh",
     "type":         "library",
-    "description":  "Provides an object-oriented wrapper for the php ssh2 extension.",
+    "description":  "Provides an object-oriented wrapper for the php ssh2 extension. SCP included",
     "keywords":     ["ssh", "ssh2"],
     "license":      "MIT",
     "authors": [
@@ -12,6 +12,10 @@
         {
             "name":     "The contributors",
             "homepage": "http://github.com/Herzult/php-ssh/contributors"
+        },
+        {
+            "name":     "Flavien Audin",
+            "homepage": "https://github.com/flavienaudin/php-ssh"
         }
     ],
     "require": {
