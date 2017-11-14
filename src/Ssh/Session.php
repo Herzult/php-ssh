@@ -47,7 +47,7 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Sftp subsystem
      *
-     * @return Sftp|Subsystem
+     * @return Sftp
      */
     public function getSftp()
     {
@@ -57,7 +57,7 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Exec subsystem
      *
-     * @return Scp|Subsystem
+     * @return Scp
      */
     public function getScp()
     {
@@ -67,7 +67,7 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Publickey subsystem
      *
-     * @return Publickey|Subsystem
+     * @return Publickey
      */
     public function getPublickey()
     {
@@ -77,7 +77,7 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Exec subsystem
      *
-     * @return Exec|Subsystem
+     * @return Exec
      */
     public function getExec()
     {
