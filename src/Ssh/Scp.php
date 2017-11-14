@@ -16,8 +16,8 @@ class Scp extends Subsystem
      * @param string $local_file <p>Path to the local file.</p>
      * @return bool true on success or false on failure.
      */
-    public function receiveFileScp ($remote_file, $local_file) {
-        return ssh2_scp_recv($this->session, $remote_file, $local_file);
+    public function receive($remote_file, $local_file) {
+        return ssh2_scp_recv($this->getResource(), $remote_file, $local_file);
     }
 
     /**
@@ -30,8 +30,8 @@ class Scp extends Subsystem
      * @param int $create_mode [optional] <p>The file will be created with the mode specified by create_mode.</p>
      * @return bool true on success or false on failure.
      */
-    public function sendFile($local_file, $remote_file, $create_mode = null) {
-        return ssh2_scp_send($this->session, $local_file, $remote_file, $create_mode);
+    public function send($local_file, $remote_file, $create_mode = null) {
+        return ssh2_scp_send($this->getResource(), $local_file, $remote_file, $create_mode);
     }
 
 
