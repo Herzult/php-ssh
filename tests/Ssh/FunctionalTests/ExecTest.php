@@ -58,5 +58,28 @@ class ExecTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('', trim($output));
     }
+
+    public function testExecuteWithStoreCwd()
+    {
+        $configuration = new Configuration('localhost');
+        $authentication = new Password(TEST_USER, TEST_PASSWORD);
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+        $exec->setStoreCwd(true);
+
+        $output = $exec->run('pwd');
+        $this->assertEquals(getenv('HOME'), trim($output));
+
+        $exec->run('cd /');
+
+        $output = $exec->run('pwd');
+        $this->assertEquals('/', trim($output));
+
+        $exec->run('cd ~');
+
+        $output = $exec->run('pwd');
+        $this->assertEquals(getenv('HOME'), trim($output));
+    }
 }
- 
+
