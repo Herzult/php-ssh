@@ -15,7 +15,7 @@ Installation
 
 The best way to add the library to your project is using [composer](http://getcomposer.org).
 
-    $ composer require herzult/php-ssh:~1.0
+    $ composer require faudin/php-ssh:~1.0
 
 Usage
 -----
@@ -112,6 +112,25 @@ $sftp = $session->getSftp();
 ```
 
 See the `Ssh\Sftp` class for more details on the available methods.
+
+#### Scp
+
+You can easily access the SCP subsystem of a session using the `getScp()` method:
+
+```php
+<?php
+
+// the session creation
+
+$scp = $session->getScp();
+$scp->send('local/path/to/file','remote/path/where/send/file');
+$scp->receive('remote/path/to/file','local/path/where/save/file');
+
+```
+
+
+
+See the `Ssh\Scp` class for more details on the available methods.
 
 #### Publickey
 

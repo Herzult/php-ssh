@@ -55,6 +55,16 @@ class Session extends AbstractResourceHolder
     }
 
     /**
+     * Returns the Exec subsystem
+     *
+     * @return Scp
+     */
+    public function getScp()
+    {
+        return $this->getSubsystem('scp');
+    }
+
+    /**
      * Returns the Publickey subsystem
      *
      * @return Publickey
@@ -105,6 +115,9 @@ class Session extends AbstractResourceHolder
         switch ($name) {
             case 'sftp':
                 $subsystem = new Sftp($this);
+                break;
+            case 'scp':
+                $subsystem = new Scp($this);
                 break;
             case 'publickey':
                 $subsystem = new Publickey($this);
