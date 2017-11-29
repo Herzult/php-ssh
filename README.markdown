@@ -15,7 +15,7 @@ Installation
 
 The best way to add the library to your project is using [composer](http://getcomposer.org).
 
-    $ composer require herzult/php-ssh:~1.0
+    $ composer require faudin/php-ssh:~1.0
 
 Usage
 -----
