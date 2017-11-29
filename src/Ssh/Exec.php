@@ -13,6 +13,9 @@ use RuntimeException;
  */
 class Exec extends Subsystem
 {
+    protected $cwd;
+    protected $storeCwd = false;
+
     protected function createResource()
     {
         $this->resource = $this->getSessionResource();
@@ -20,18 +23,32 @@ class Exec extends Subsystem
 
     public function run($cmd, $pty = null, array $env = array(), $width = 80, $height = 25, $width_height_type = SSH2_TERM_UNIT_CHARS)
     {
-        $cmd .= ';echo -ne "[return_code:$?]"';
+        if ($this->cwd && $this->storeCwd) {
+            $cmd = 'cd '.escapeshellarg($this->cwd).';'.$cmd;
+        }
+
+        $cmd .= ';echo -ne "\\0" "$?" "\\0";pwd';
         $stdout = ssh2_exec($this->getResource(), $cmd, $pty, $env, $width, $height, $width_height_type);
         $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
         stream_set_blocking($stderr, true);
         stream_set_blocking($stdout, true);
 
         $output = stream_get_contents($stdout);
-        preg_match('/\[return_code:(.*?)\]/', $output, $match);
-        if ((int) $match[1] !== 0) {
-            throw new RuntimeException(stream_get_contents($stderr), (int) $match[1]);
+        preg_match('/^(.*)\\0 (\d+) \\0([^\\0]+)$/s', $output, $match);
+
+        list($_, $output, $retcode, $cwd) = $match;
+
+        $this->cwd = rtrim($cwd, "\r\n");
+
+        if ((int) $retcode !== 0) {
+            throw new RuntimeException(stream_get_contents($stderr), (int) $retcode);
         }
 
-        return preg_replace('/\[return_code:(.*?)\]/', '', $output);
+        return $output;
+    }
+
+    public function setStoreCwd($store)
+    {
+        $this->storeCwd = $store;
     }
 }
