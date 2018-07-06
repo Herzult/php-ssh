@@ -19,17 +19,18 @@
         "ext-ssh2": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
-        "symfony/filesystem": "~2.4"
+        "phpunit/phpunit": "^7.0",
+        "symfony/filesystem": "^4.0"
     },
     "autoload": {
-        "psr-0": {
-            "Ssh": "src/"
+        "psr-4": {
+            "Ssh\\": "src/Ssh/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.x-dev"
+            "dev-master": "1.1.x-dev",
+            "dev-develop": "2.0.x-dev"
         }
     }
 }
