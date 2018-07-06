@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ssh;
+
+use function array_map;
 
 /**
  * Configuration of an SSH connection
@@ -9,106 +11,108 @@ namespace Ssh;
  */
 class Configuration
 {
+    /**
+     * @var string
+     */
     protected $host;
+
+    /**
+     * @var int
+     */
     protected $port;
+
+    /**
+     * @var array|string[]
+     */
     protected $methods;
+
+    /**
+     * @var callable[]
+     */
     protected $callbacks;
+
+    /**
+     * @var string
+     */
     protected $identity;
 
     /**
-     * Constructor
-     *
-     * @param  string  $host
-     * @param  integer $port
-     * @param  array   $methods
-     * @param  array   $callbacks
-     * @param  string  $identity
+     * @param callable[] $callbacks Callbacks as expected by in ssh2_connect
+     * @see http://php.net/manual/en/function.ssh2-connect.php ssh2_connect
      */
-    public function __construct($host, $port = 22, array $methods = array(), array $callbacks = array(), $identity = null)
-    {
+    public function __construct(
+        string $host,
+        int $port = 22,
+        array $methods = [],
+        array $callbacks = [],
+        string $identity = null
+    ) {
         $this->host      = $host;
         $this->port      = $port;
         $this->methods   = $methods;
-        $this->callbacks = $callbacks;
         $this->identity  = $identity;
+
+        $this->setCallbacks($callbacks);
     }
 
-    /**
-     * Defines the host
-     *
-     * @param  string $host
-     */
-    public function setHost($host)
+    public function setHost(string $host): void
     {
         $this->host = $host;
     }
 
-    /**
-     * Returns the host
-     *
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * Defines the port
-     *
-     * @param  integer $port
-     */
-    public function setPort($port)
+    public function setPort(int $port): void
     {
         $this->port = $port;
     }
 
-    /**
-     * Returns the port
-     *
-     * @return integer
-     */
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }
 
     /**
-     * Defines the methods
+     * Methods as passed to ssh2_connect()
      *
-     * @param  array $methods
+     * @see http://php.net/manual/en/function.ssh2-connect.php ssh2_connect
      */
-    public function setMethods(array $methods)
+    public function setMethods(array $methods): void
     {
         $this->methods = $methods;
     }
 
     /**
-     * Returns the methods
+     * Methods for ssh2_connect()
      *
-     * @return array
+     * @see http://php.net/manual/en/function.ssh2-connect.php ssh2_connect
      */
-    public function getMethods()
+    public function getMethods(): array
     {
         return $this->methods;
     }
 
     /**
-     * Defines the callbacks
+     * The callbacks for ssh2_connect
      *
-     * @param array $callbacks
+     * @param callable[] $callbacks
+     * @see http://php.net/manual/en/function.ssh2-connect.php ssh2_connect
      */
-    public function setCallbacks(array $callbacks)
+    public function setCallbacks(array $callbacks): void
     {
-        $this->callbacks = $callbacks;
+        $this->callbacks = array_map(
+            // Ensure typesafety on the callbacks array
+            function(callable $cb): callable {
+                return $cb;
+            },
+            $callbacks
+        );
     }
 
-    /**
-     * Returns the callbacks
-     *
-     * @return array $callbacks
-     */
-    public function getCallbacks()
+    public function getCallbacks(): array
     {
         return $this->callbacks;
     }
@@ -116,30 +120,24 @@ class Configuration
     /**
      * Returns an array of argument designed for the ssh2_connect function
      *
-     * @return array
+     * @see http://php.net/manual/en/function.ssh2-connect.php
      */
-    public function asArguments()
+    public function asArguments(): array
     {
-        return array(
+        return [
             $this->host,
             $this->port,
             $this->methods,
             $this->callbacks
-        );
+        ];
     }
 
-    /**
-     * @return string
-     */
-    public function getIdentity()
+    public function getIdentity(): string
     {
         return $this->identity;
     }
 
-    /**
-     * @param string $identity
-     */
-    public function setIdentity($identity)
+    public function setIdentity(string $identity): void
     {
         $this->identity = $identity;
     }

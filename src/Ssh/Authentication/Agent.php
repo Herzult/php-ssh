@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ssh\Authentication;
 
@@ -11,14 +11,12 @@ use Ssh\Authentication;
  */
 class Agent implements Authentication
 {
+    /**
+     * @var string
+     */
     protected $username;
 
-    /**
-     * Constructor
-     *
-     * @param  string $username       The authentication username
-     */
-    public function __construct($username)
+    public function __construct(string $username)
     {
         $this->username = $username;
     }
@@ -26,7 +24,7 @@ class Agent implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session)
+    public function authenticate($session): bool
     {
         return ssh2_auth_agent(
             $session,

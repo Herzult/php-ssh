@@ -11,9 +11,24 @@ use Ssh\Authentication;
  */
 class PublicKeyFile implements Authentication
 {
+    /**
+     * @var string
+     */
     protected $username;
+
+    /**
+     * @var string
+     */
     protected $publicKeyFile;
+
+    /**
+     * @var string
+     */
     protected $privateKeyFile;
+
+    /**
+     * @var null|string
+     */
     protected $passPhrase;
 
     /**
@@ -24,8 +39,12 @@ class PublicKeyFile implements Authentication
      * @param  string $privateKeyFile The path of the private key file
      * @param  string $passPhrase     An optional pass phrase for the key
      */
-    public function __construct($username, $publicKeyFile, $privateKeyFile, $passPhrase = null)
-    {
+    public function __construct(
+        string $username,
+        string $publicKeyFile,
+        string $privateKeyFile,
+        string $passPhrase = null
+    ) {
         $this->username = $username;
         $this->publicKeyFile = $publicKeyFile;
         $this->privateKeyFile = $privateKeyFile;
@@ -35,7 +54,7 @@ class PublicKeyFile implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session)
+    public function authenticate($session): bool
     {
         return ssh2_auth_pubkey_file(
             $session,

@@ -11,8 +11,8 @@ use RuntimeException;
  */
 class SshConfigFileConfiguration extends Configuration
 {
-
     const DEFAULT_SSH_IDENTITY = '~/.ssh/id_rsa';
+
 
     protected $configs = array();
     protected $config;
@@ -63,9 +63,11 @@ class SshConfigFileConfiguration extends Configuration
         if (!file_exists($file) || !is_readable($file)) {
             throw new RuntimeException("The file '$file' does not exist or is not readable");
         }
+
         $contents = file_get_contents($file);
         $configs = array();
         $lineNumber = 1;
+
         foreach (explode(PHP_EOL, $contents) as $line) {
             $line = trim($line);
             if ($line == '' || $line[0] == '#') {
@@ -104,6 +106,7 @@ class SshConfigFileConfiguration extends Configuration
             }
             $lineNumber++;
         }
+
         $this->configs = array_merge($this->configs, $configs);
     }
 

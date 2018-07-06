@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ssh\Authentication;
 
@@ -11,26 +11,49 @@ use Ssh\Authentication;
  */
 class HostBasedFile implements Authentication
 {
+    /**
+     * @var string
+     */
     protected $username;
+
+    /**
+     * @var string
+     */
     protected $hostname;
+
+    /**
+     * @var string
+     */
     protected $publicKeyFile;
+
+    /**
+     * @var string
+     */
     protected $privateKeyFile;
+
+    /**
+     * @var null|string
+     */
     protected $passPhrase;
+
+    /**
+     * @var null|string
+     */
     protected $localUsername;
 
     /**
-     * Constructor
-     *
-     * @param  string $username
-     * @param  string $hostname
-     * @param  string $publicKeyFile
-     * @param  string $privateKeyFile
      * @param  string $passPhrase     An optional pass phrase for the key
-     * @param  string $localUsername  An optional local usernale. If omitted,
+     * @param  string $localUsername  An optional local username. If omitted,
      *                                the username will be used
      */
-    public function __construct($username, $hostname, $publicKeyFile, $privateKeyFile, $passPhrase = null, $localUsername = null)
-    {
+    public function __construct(
+        string $username,
+        string $hostname,
+        string $publicKeyFile,
+        string $privateKeyFile,
+        string $passPhrase = null,
+        string $localUsername = null
+    ) {
         $this->username = $username;
         $this->hostname = $hostname;
         $this->publicKeyFile = $publicKeyFile;
@@ -39,10 +62,7 @@ class HostBasedFile implements Authentication
         $this->localUsername = $localUsername;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function authenticate($session)
+    public function authenticate($session): bool
     {
         return ssh2_auth_hostbased_file(
             $session,

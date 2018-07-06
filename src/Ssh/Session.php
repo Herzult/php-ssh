@@ -11,8 +11,19 @@ use InvalidArgumentException, RuntimeException;
  */
 class Session extends AbstractResourceHolder
 {
+    /**
+     * @var Configuration
+     */
     protected $configuration;
+
+    /**
+     * @var Authentication
+     */
     protected $authentication;
+
+    /**
+     * @var Subsystem[]
+     */
     protected $subsystems;
 
     /**
@@ -25,21 +36,21 @@ class Session extends AbstractResourceHolder
     {
         $this->configuration  = $configuration;
         $this->authentication = $authentication;
-        $this->subsystem      = array();
+        $this->subsystems     = [];
     }
 
     /**
-     * Defines the authentication. If the
+     * Defines the authentication.
      *
-     * @param  Authentication $authentication
+     * If this is the fist authentication to the instance (not provided via construct) and the session is established,
+     * an authentication attempt will be intiated.
      */
-    public function setAuthentication(Authentication $authentication)
+    public function setAuthentication(Authentication $authentication): void
     {
-        $firstAuthentication = null === $this->authentication;
-
+        $isFirstAuthentication = (null === $this->authentication);
         $this->authentication = $authentication;
 
-        if ($firstAuthentication && is_resource($this->resource)) {
+        if ($isFirstAuthentication && is_resource($this->resource)) {
             $this->authenticate();
         }
     }
@@ -47,9 +58,9 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Sftp subsystem
      *
-     * @return Sftp
+     * @return Sftp|Subsystem
      */
-    public function getSftp()
+    public function getSftp(): Sftp
     {
         return $this->getSubsystem('sftp');
     }
@@ -57,9 +68,9 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Publickey subsystem
      *
-     * @return Publickey
+     * @return Publickey|Subsystem
      */
-    public function getPublickey()
+    public function getPublickey(): Publickey
     {
         return $this->getSubsystem('publickey');
     }
@@ -67,9 +78,9 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the Exec subsystem
      *
-     * @return Exec
+     * @return Exec|Subsystem
      */
-    public function getExec()
+    public function getExec(): Exec
     {
         return $this->getSubsystem('exec');
     }
@@ -77,13 +88,9 @@ class Session extends AbstractResourceHolder
     /**
      * Returns the specified subsystem
      *
-     * If the subsystem does not exists, it will create it
-     *
-     * @param  string $name The subsystem's name
-     *
-     * @return Subsystem
+     * If the subsystem does not exists, this method will attempt to create it
      */
-    public function getSubsystem($name)
+    public function getSubsystem(string $name): Subsystem
     {
         if (!isset($this->subsystems[$name])) {
             $this->createSubsystem($name);
@@ -95,23 +102,24 @@ class Session extends AbstractResourceHolder
     /**
      * Creates the specified subsystem
      *
-     * @param  string $name The subsystem's name
-     *
      * @throws InvalidArgumentException if the specified subsystem is no
      *                                  supported (e.g does not exist)
      */
-    protected function createSubsystem($name)
+    protected function createSubsystem(string $name): void
     {
         switch ($name) {
             case 'sftp':
                 $subsystem = new Sftp($this);
                 break;
+
             case 'publickey':
                 $subsystem = new Publickey($this);
                 break;
+
             case 'exec':
                 $subsystem = new Exec($this);
                 break;
+
             default:
                 throw new InvalidArgumentException(sprintf('The subsystem \'%s\' is not supported.', $name));
         }
@@ -126,7 +134,7 @@ class Session extends AbstractResourceHolder
      *
      * @throws RuntimeException if the connection fail
      */
-    protected function createResource()
+    protected function createResource(): void
     {
         $resource = $this->connect($this->configuration->asArguments());
 
@@ -144,13 +152,11 @@ class Session extends AbstractResourceHolder
     /**
      * Opens a connection with the remote server using the given arguments
      *
-     * @param  array $arguments An array of arguments
-     *
      * @return resource
      */
-    protected function connect(array $arguments)
+    private function connect(array $arguments)
     {
-        return call_user_func_array('ssh2_connect', $arguments);
+        return ssh2_connect(...$arguments);
     }
 
     /**
@@ -159,7 +165,7 @@ class Session extends AbstractResourceHolder
      *
      * @throws RuntimeException on authentication failure
      */
-    protected function authenticate()
+    private function authenticate(): void
     {
         $authenticated = $this->authentication->authenticate($this->resource);
 
@@ -168,10 +174,7 @@ class Session extends AbstractResourceHolder
         }
     }
     
-    /**
-     * @return Configuration
-     */
-    public function getConfiguration()
+    public function getConfiguration(): Configuration
     {
         return $this->configuration;
     }

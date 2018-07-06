@@ -24,10 +24,8 @@ class Publickey extends Subsystem
      *                             If the server is unable to support an
      *                             attribute marked mandatory, it will abort
      *                             the add process.
-     *
-     * @return Boolean TRUE on success, or FALSE on failure
      */
-    public function add($algoname, $blob, $overwrite = false, array $attributes = array())
+    public function add(string $algoname, string $blob, bool $overwrite = false, array $attributes = []): bool
     {
         return ssh2_publickey_add($this->getResource(), $algoname, $blob, $overwrite, $attributes);
     }
@@ -39,7 +37,7 @@ class Publickey extends Subsystem
      *               associative array containing: name, blob, and attrs
      *               elements.
      */
-    public function getList()
+    public function getList(): iterable
     {
         return ssh2_publickey_list($this->getResource());
     }
@@ -49,10 +47,8 @@ class Publickey extends Subsystem
      *
      * @param  string $algoname The algorithm (e.g: ssh-dss, ssh-rsa)
      * @param  string $blob     The blob as binary data
-     *
-     * @return Boolean TRUE on success, or FALSE on failure
      */
-    public function remove($algoname, $blob)
+    public function remove(string $algoname, string $blob): bool
     {
         return ssh2_publickey_remove($this->getResource(), $algoname, $blob);
     }
@@ -60,7 +56,7 @@ class Publickey extends Subsystem
     /**
      * {@inheritDoc}
      */
-    public function createResource()
+    protected function createResource()
     {
         $resource = ssh2_publickey_init($this->getSessionResource());
 

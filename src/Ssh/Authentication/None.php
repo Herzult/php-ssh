@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ssh\Authentication;
 
@@ -11,14 +11,15 @@ use Ssh\Authentication;
  */
 class None implements Authentication
 {
+    /**
+     * @var string
+     */
     protected $username;
 
     /**
      * Constructor
-     *
-     * @param  string $username The authentication username
      */
-    public function __construct($username)
+    public function __construct(string $username)
     {
         $this->username = $username;
     }
@@ -26,8 +27,8 @@ class None implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session)
+    public function authenticate($session): bool
     {
-        return true === ssh2_auth_none($session, $this->username);
+        return (true === ssh2_auth_none($session, $this->username));
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ssh;
 
@@ -13,8 +13,6 @@ interface Authentication
      * Authenticates the given SSH session
      *
      * @param  resource $session
-     *
-     * @return Boolean TRUE on success, or FALSE on failure
      */
-    function authenticate($session);
+    function authenticate($session): bool;
 }

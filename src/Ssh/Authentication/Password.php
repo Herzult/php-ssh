@@ -11,16 +11,17 @@ use Ssh\Authentication;
  */
 class Password implements Authentication
 {
+    /**
+     * @var string
+     */
     protected $username;
-    protected $password;
 
     /**
-     * Constructor
-     *
-     * @param  string $username The authentication username
-     * @param  string $password The authentication password
+     * @var string
      */
-    public function __construct($username, $password)
+    protected $password;
+
+    public function __construct(string $username, string $password)
     {
         $this->username = $username;
         $this->password = $password;
@@ -29,9 +30,10 @@ class Password implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session)
+    public function authenticate($session): bool
     {
         // This function generates a undocumented warning on authentification failure.
+        // TODO: Check if this is still needed with ext-ssh2 >= 1.x
         return @ssh2_auth_password($session, $this->username, $this->password);
     }
 }
