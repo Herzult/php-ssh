@@ -167,6 +167,11 @@ class Sftp extends Subsystem
         return $this->exists($path);
     }
 
+    public function getDirectory(string $path): SftpDirectoryIterator
+    {
+        return new SftpDirectoryIterator($this, $path);
+    }
+
     /**
      * Scans a directory
      *
@@ -175,7 +180,7 @@ class Sftp extends Subsystem
      *
      * @return Generator
      */
-    private function scanDirectory(string $directory): Generator
+    public function scanDirectory(string $directory): Generator
     {
         if (!$results = @scandir($this->buildUrl($directory))) {
             return;

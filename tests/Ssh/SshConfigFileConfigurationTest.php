@@ -6,7 +6,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function testParseValidSshConfigFile()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
 
         $this->assertAttributeEquals(array(
             array(
@@ -52,7 +52,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseSshConfigFileHostNotFound()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'notfound');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'notfound');
     }
 
     public function testParseInvalidSshConfigFile()
@@ -60,7 +60,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
         $exceptions = 0;
         $file = __DIR__ . '/Fixtures/config_invalid';
         try {
-            new SshConfigFileConfiguration($file, 'test');
+            new SshConfiguration($file, 'test');
         } catch (\RuntimeException $e) {
             $exceptions++;
             $this->assertEquals("The file '$file' is not parsable at line '1'", $e->getMessage());
@@ -70,13 +70,13 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testHostNameFromConfig()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'tamp');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'tamp');
         $this->assertAttributeEquals('tamp.yo', 'host', $config);
     }
 
     public function testPortFromConfig()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'tamp');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'tamp');
         $this->assertAttributeEquals('12345', 'port', $config);
     }
 
@@ -86,15 +86,15 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseNonExsistantSshConfigFile()
     {
-        new SshConfigFileConfiguration('fakefile', 'test');
+        new SshConfiguration('fakefile', 'test');
     }
 
     /**
-     * @covers \Ssh\SshConfigFileConfiguration
+     * @covers \Ssh\SshConfiguration
      */
     public function testGetAuthentication()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
 
         $identity = getenv('HOME') . "/.ssh/id_rsa";
 
@@ -110,7 +110,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(new Authentication\None('test'), $config->getAuthentication(null, 'test'));
         }
 
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
 
         $this->assertEquals(
             new Authentication\PublicKeyFile(
@@ -122,7 +122,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
             $config->getAuthentication()
         );
 
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'testuser.com');
 
         $this->assertEquals(
             new Authentication\PublicKeyFile(
@@ -138,7 +138,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testIdentityFilePath()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'identity');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'identity');
         $this->assertAttributeEquals(array(
             'user' => 'identity',
             'identityfile' => getenv('HOME') . '/identity'
@@ -151,7 +151,7 @@ class SshConfigFileConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAuthenticationFailed()
     {
-        $config = new SshConfigFileConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
+        $config = new SshConfiguration(__DIR__ . '/Fixtures/config_valid', 'test');
         $config->getAuthentication();
     }
 }
