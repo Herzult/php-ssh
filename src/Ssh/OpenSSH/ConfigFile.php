@@ -5,22 +5,26 @@
  * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
  */
 
-namespace Ssh\SshConfig;
+namespace Ssh\OpenSSH;
 
+use function file_exists;
+use LogicException;
+use Ssh\Authentication;
+use Ssh\Configuration;
 use Ssh\HostConfiguration;
 
 class ConfigFile
 {
+    use ConfigDecoratorTrait;
+
     const DEFAULT_SSH_CONFIG = '~/.ssh/id_rsa';
 
     private $data = [];
 
-    private $matched;
-
-    public function __construct(Configuration $wrapped, string $file = self::DEFAULT_SSH_CONFIG)
+    public function __construct(Configuration $hostConfig, string $file = self::DEFAULT_SSH_CONFIG)
     {
         $this->data = (new Parser())->parse($this->expandPath($file));
-        $this->matched = $this->findConfig($wrapped);
+        $this->decoratedConfig = $this->findConfig($hostConfig);
     }
 
     /**
@@ -31,7 +35,22 @@ class ConfigFile
         return preg_replace('#^~/#', getenv('HOME') . '/', $path);
     }
 
-    private function findConfig(Configuration $config): SshConfiguration
+    private function prepareIdFile(?string $path): ?string
+    {
+        if ($path === null) {
+            return $path;
+        }
+
+        $path = $this->expandPath($path);
+
+        if (($path === '') || !file_exists($path)) {
+            return null;
+        }
+
+        return $path;
+    }
+
+    private function findConfig(Configuration $config): HostConfig
     {
         $matches = array_filter($this->data, function(array $config) use ($config): bool {
             return fnmatch($config['host'], $config->getHost());
@@ -43,7 +62,7 @@ class ConfigFile
 
         $result = (count($matches) > 1)? array_merge(...$matches) : ($matches[0] ?? []);
 
-        return new SshConfiguration(
+        return new HostConfig(
             new HostConfiguration(
                 $result['hostname'] ?? $config->getHost(),
                 intval($result['port'] ?? $config->getPort()),
@@ -51,7 +70,7 @@ class ConfigFile
                 $config->getCallbacks()
             ),
             $result['user'] ?? null,
-            $result['identityfile'] ?? null
+            $this->prepareIdFile($result['identityfile'] ?? null)
         );
     }
 
@@ -65,28 +84,36 @@ class ConfigFile
 
     /**
      * Return an authentication mechanism based on the configuration file
-     * @param  string|null $passphrase
-     * @param  string|null $user
-     * @return PublicKeyFile|None
+     * @return Authentication
      */
-    public function getAuthentication($passphrase = null, $user = null)
+    public function createAuthenticationMethod(string $passphrase = null, string $user = null): Authentication
     {
-        if (is_null($user) && !isset($this->config['user'])) {
-            throw new RuntimeException("Can not authenticate for '{$this->host}' could not find user to authenticate as");
+        $user = $user ?? $this->decoratedConfig->getUser();
+
+        if ($user === null) {
+            throw new LogicException(sprintf(
+                'Can not create authentication for "%s" without a user',
+                $this->getHost()
+            ));
         }
-        $user = $user ?: $this->config['user'];
-        if (isset($this->config['identityfile'])) {
+
+        $privateKey = $this->decoratedConfig->getPrivateKeyFile();
+
+        if ($privateKey) {
             return new Authentication\PublicKeyFile(
                 $user,
-                $this->config['identityfile'] . '.pub',
-                $this->config['identityfile'],
+                $this->decoratedConfig->getPublicKeyFile(),
+                $privateKey,
                 $passphrase
             );
+        } else if ($passphrase !== null) {
+            return new Authentication\Password($user, $passphrase);
         } else {
             return new Authentication\None(
                 $user
             );
         }
     }
+
 
 }

@@ -5,13 +5,10 @@
  * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
  */
 
-namespace Ssh\SshConfig;
+namespace Ssh\Exception;
 
-trait ConfigDecoratorTrait
+use Throwable;
+
+interface ExceptionInterface extends Throwable
 {
-    /**
-     * @var Configuration
-     */
-    private $hostConfig;
-
 }

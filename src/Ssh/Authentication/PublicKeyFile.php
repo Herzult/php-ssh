@@ -3,6 +3,7 @@
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
+use Ssh\Session;
 
 /**
  * Public key file authentication
@@ -54,10 +55,10 @@ class PublicKeyFile implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session): bool
+    public function authenticate(Session $session): bool
     {
         return ssh2_auth_pubkey_file(
-            $session,
+            $session->getResource(),
             $this->username,
             $this->publicKeyFile,
             $this->privateKeyFile,

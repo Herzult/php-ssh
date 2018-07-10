@@ -3,6 +3,7 @@
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
+use Ssh\Session;
 
 /**
  * Username based authentication
@@ -27,8 +28,8 @@ class None implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session): bool
+    public function authenticate(Session $session): bool
     {
-        return (true === ssh2_auth_none($session, $this->username));
+        return (true === ssh2_auth_none($session->getResource(), $this->username));
     }
 }

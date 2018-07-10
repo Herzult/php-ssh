@@ -11,8 +11,6 @@ interface Authentication
 {
     /**
      * Authenticates the given SSH session
-     *
-     * @param  resource $session
      */
-    function authenticate($session): bool;
+    function authenticate(Session $session): bool;
 }

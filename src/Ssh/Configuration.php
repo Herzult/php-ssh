@@ -37,5 +37,5 @@ interface Configuration
     /**
      * The identity to connect with
      */
-    public function getIdentity(): string;
+    public function getIdentity(): ?string;
 }

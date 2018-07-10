@@ -2,6 +2,8 @@
 
 namespace Ssh;
 
+use InvalidArgumentException;
+use RuntimeException;
 use function fclose;
 use function feof;
 use function fgets;
@@ -11,16 +13,10 @@ use function fstat;
 use function ftruncate;
 use function fwrite;
 use function in_array;
-use InvalidArgumentException;
-use function is_resource;
-use function is_string;
 use function preg_match;
-use RuntimeException;
+use function strlen;
 use const SSH2_TERM_UNIT_CHARS;
 use const SSH2_TERM_UNIT_PIXELS;
-use function stream_copy_to_stream;
-use function stream_get_contents;
-use function strlen;
 
 /**
  * Wrapper for ssh2_exec
@@ -104,29 +100,6 @@ class Exec extends Subsystem
             fclose($this->stderr);
             $this->stderr = null;
         }
-    }
-
-    private function processStdout($stream): int
-    {
-        $this->stdout = fopen('php://temp', 'w+');
-        $line = '';
-
-        while (!feof($stream)) {
-            $line = fgets($stream);
-            fwrite($this->stdout, $line);
-        }
-
-        $match = [];
-
-        if (!preg_match('/\[return_code:(\d+)?\]/', $line, $match)) {
-            throw new RuntimeException('Unexpected end of STDOUT stream');
-        }
-
-        $size = fstat($this->stdout)['size'];
-        ftruncate($this->stdout, max($size - (strlen($match[0]) + 1), 0));
-        fseek($this->stdout, 0);
-
-        return (int)$match[1];
     }
 
     public function withPty(?string $pty): self

@@ -9,8 +9,11 @@ use RuntimeException;
  *
  * @author Antoine Hérault <antoine.herault@gmail.com>
  */
-abstract class AbstractResourceHolder implements ResourceHolder
+abstract class AbstractResourceProvider implements ResourceHolder
 {
+    /**
+     * @var resource
+     */
     protected $resource;
 
     /**

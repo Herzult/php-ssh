@@ -3,6 +3,7 @@
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
+use Ssh\Session;
 
 /**
  * Password Authentication
@@ -30,10 +31,10 @@ class Password implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session): bool
+    public function authenticate(Session $session): bool
     {
         // This function generates a undocumented warning on authentification failure.
-        // TODO: Check if this is still needed with ext-ssh2 >= 1.x
-        return @ssh2_auth_password($session, $this->username, $this->password);
+        // TODO: Check if shut-up is still needed with ext-ssh2 >= 1.x
+        return @ssh2_auth_password($session->getResource(), $this->username, $this->password);
     }
 }

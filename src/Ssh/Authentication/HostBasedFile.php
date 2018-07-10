@@ -3,6 +3,7 @@
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
+use Ssh\Session;
 
 /**
  * Host based file authentication
@@ -62,10 +63,10 @@ class HostBasedFile implements Authentication
         $this->localUsername = $localUsername;
     }
 
-    public function authenticate($session): bool
+    public function authenticate(Session $session): bool
     {
         return ssh2_auth_hostbased_file(
-            $session,
+            $session->getResource(),
             $this->username,
             $this->hostname,
             $this->publicKeyFile,

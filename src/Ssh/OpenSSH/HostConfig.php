@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Ssh\SshConfig;
+namespace Ssh\OpenSSH;
 
 use function array_filter;
 use function count;
@@ -15,9 +15,12 @@ use Ssh\HostConfiguration;
  * SSH Config File Configuration
  *
  * @author Cam Spiers <camspiers@gmail.com>
+ * @author Axel Helmert <ah@luka.de>
  */
-class SshConfiguration implements Configuration
+class HostConfig implements Configuration
 {
+    use ConfigDecoratorTrait;
+
     const DEFAULT_SSH_CONFIG = '~/.ssh/id_rsa';
 
     /**
@@ -37,39 +40,9 @@ class SshConfiguration implements Configuration
 
     public function __construct(Configuration $hostConfig, string $user = null, string $privateKeyFile = null)
     {
-        $this->hostConfig = $hostConfig;
+        $this->decoratedConfig = $hostConfig;
         $this->user = $user;
         $this->privateKeyFile = $privateKeyFile;
-    }
-
-    public function getHost(): string
-    {
-        return $this->hostConfig->getHost();
-    }
-
-    public function getPort(): int
-    {
-        return $this->hostConfig->getPort();
-    }
-
-    public function getIdentity(): string
-    {
-        return $this->hostConfig->getIdentity();
-    }
-
-    public function getMethods(): array
-    {
-        return $this->hostConfig->getMethods();
-    }
-
-    public function getCallbacks(): array
-    {
-        $this->hostConfig->getCallbacks();
-    }
-
-    public function asArguments(): array
-    {
-        return $this->hostConfig->asArguments();
     }
 
     public function getUser(): string
@@ -91,10 +64,9 @@ class SshConfiguration implements Configuration
         return $this->privateKeyFile . '.pub';
     }
 
-
     /**
      * Return an authentication mechanism based on the configuration file
-     * @return PublicKeyFile|None
+     * @return Authentication
      */
     public function createAuthentication(string $passphrase = null, string $user = null): Authentication
     {
@@ -107,8 +79,8 @@ class SshConfiguration implements Configuration
         if ($this->privateKeyFile) {
             return new Authentication\PublicKeyFile(
                 $user,
-                $this->config['identityfile'] . '.pub',
-                $this->config['identityfile'],
+                $this->getPublicKeyFile(),
+                $this->getPrivateKeyFile(),
                 $passphrase
             );
         } else {

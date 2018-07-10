@@ -3,28 +3,32 @@
 namespace Ssh;
 
 use InvalidArgumentException, RuntimeException;
+use function is_resource;
+use LogicException;
+use Ssh\Exception\AuthenticationException;
+
 
 /**
  * SSH session
  *
  * @author Antoine Hérault <antoine.herault@gmail.com>
  */
-class Session extends AbstractResourceHolder
+class Session extends AbstractResourceProvider
 {
     /**
      * @var Configuration
      */
-    protected $configuration;
+    private $configuration;
 
     /**
      * @var Authentication
      */
-    protected $authentication;
+    private $authentication;
 
     /**
      * @var Subsystem[]
      */
-    protected $subsystems;
+    private $subsystems;
 
     /**
      * Constructor
@@ -43,16 +47,23 @@ class Session extends AbstractResourceHolder
      * Defines the authentication.
      *
      * If this is the fist authentication to the instance (not provided via construct) and the session is established,
-     * an authentication attempt will be intiated.
+     * an authentication attempt will be initiated.
+     *
+     * @throws LogicException When the session is already established with an authentication
+     * @throws AuthenticationException When the session ais established and the authentication attempt fails
      */
     public function setAuthentication(Authentication $authentication): void
     {
-        $isFirstAuthentication = (null === $this->authentication);
-        $this->authentication = $authentication;
-
-        if ($isFirstAuthentication && is_resource($this->resource)) {
-            $this->authenticate();
+        if (!is_resource($this->resource)) {
+            $this->authentication = $authentication;
+            return;
         }
+
+        if ($this->authentication) {
+            throw new LogicException('Cannot re-authenticate an already established session');
+        }
+
+        $this->authenticate($authentication);
     }
 
     /**
@@ -136,16 +147,14 @@ class Session extends AbstractResourceHolder
      */
     protected function createResource(): void
     {
-        $resource = $this->connect($this->configuration->asArguments());
+        $this->resource = $this->connect($this->configuration->asArguments());
 
-        if (!is_resource($resource)) {
+        if (!is_resource($this->resource)) {
             throw new RuntimeException('The SSH connection failed.');
         }
 
-        $this->resource = $resource;
-
-        if (null !== $this->authentication) {
-            $this->authenticate();
+        if ($this->authentication) {
+            $this->authenticate($this->authentication);
         }
     }
 
@@ -156,22 +165,22 @@ class Session extends AbstractResourceHolder
      */
     private function connect(array $arguments)
     {
-        return ssh2_connect(...$arguments);
+        return @ssh2_connect(...$arguments);
     }
 
     /**
      * Authenticates over the current SSH session and using the defined
      * authentication
      *
-     * @throws RuntimeException on authentication failure
+     * @throws AuthenticationException
      */
-    private function authenticate(): void
+    private function authenticate(Authentication $authentication): void
     {
-        $authenticated = $this->authentication->authenticate($this->resource);
-
-        if (!$authenticated) {
-            throw new RuntimeException('The authentication over the current SSH connection failed.');
+        if (!$authentication->authenticate($this)) {
+            throw AuthenticationException::authenticationFailed($this);
         }
+
+        $this->authentication = $authentication;
     }
     
     public function getConfiguration(): Configuration

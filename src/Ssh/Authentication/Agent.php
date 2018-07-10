@@ -3,6 +3,7 @@
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
+use Ssh\Session;
 
 /**
  * SSH Agent authentication
@@ -24,10 +25,10 @@ class Agent implements Authentication
     /**
      * {@inheritDoc}
      */
-    public function authenticate($session): bool
+    public function authenticate(Session $session): bool
     {
         return ssh2_auth_agent(
-            $session,
+            $session->getResource(),
             $this->username
         );
     }

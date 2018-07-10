@@ -9,22 +9,15 @@ use RuntimeException;
  *
  * @author Antoine Hérault <antoine.herault@gmail.com>
  */
-abstract class Subsystem extends AbstractResourceHolder
+abstract class Subsystem extends AbstractResourceProvider
 {
-    protected $session;
-    protected $resource;
-
     /**
-     * Constructor
-     *
-     * @param  mixed $session A Session instance or a SSH session resource
+     * @var Session
      */
-    public function __construct($session)
-    {
-        if (!$session instanceof Session && !is_resource($session)) {
-            throw new \InvalidArgumentException('The session must be either a Session instance or a SSH session resource.');
-        }
+    private $session;
 
+    public function __construct(Session $session)
+    {
         $this->session = $session;
     }
 
@@ -33,12 +26,8 @@ abstract class Subsystem extends AbstractResourceHolder
      *
      * @return resource
      */
-    public function getSessionResource()
+    protected function getSessionResource()
     {
-        if ($this->session instanceof Session) {
-            return $this->session->getResource();
-        } else {
-            return $this->session;
-        }
+        return $this->session->getResource();
     }
 }

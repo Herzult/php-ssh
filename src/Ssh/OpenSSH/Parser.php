@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
  */
 
-namespace Ssh\SshConfig;
+namespace Ssh\OpenSSH;
 
 use RuntimeException;
 use function array_map;
@@ -22,8 +22,6 @@ class Parser
      */
     public function parse(string $file): array
     {
-        $file = $this->expandPath($file);
-
         if (!file_exists($file) || !is_readable($file)) {
             throw new RuntimeException("The file '$file' does not exist or is not readable");
         }

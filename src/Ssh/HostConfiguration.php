@@ -119,7 +119,7 @@ class HostConfiguration implements Configuration
         ];
     }
 
-    public function getIdentity(): string
+    public function getIdentity(): ?string
     {
         return $this->identity;
     }
