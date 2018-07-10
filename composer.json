@@ -1,5 +1,5 @@
 {
-    "name":         "herzult/php-ssh",
+    "name":         "luka/php-ssh",
     "type":         "library",
     "description":  "Provides an object-oriented wrapper for the php ssh2 extension.",
     "keywords":     ["ssh", "ssh2"],
@@ -10,9 +10,18 @@
             "homepage": "https://github.com/Herzult"
         },
         {
-            "name":     "The contributors",
+            "name":     "herzult/php-ssh contributors",
             "homepage": "http://github.com/Herzult/php-ssh/contributors"
-        }
+        },
+        {
+            "name": "Axel Helmert",
+            "homepage": "http://www.luka.de/"
+        },
+        {
+            "name":     "luka/php-ssh contributors",
+            "homepage": "http://github.com/lukanetconsult/php-ssh/contributors"
+        },
+
     ],
     "require": {
         "php": "^7.1",
