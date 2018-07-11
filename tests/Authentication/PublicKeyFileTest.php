@@ -3,10 +3,12 @@
 
 namespace Ssh\Authentication;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @covers \Ssh\Authentication\PublicKeyFile
  */
-class PublicKeyFileTest extends \PHPUnit_Framework_TestCase
+class PublicKeyFileTest extends TestCase
 {
     public function testClass() {
         $auth = new PublicKeyFile('user', 'path/public.key', 'path/private.key', 'passPhrase');
@@ -27,4 +29,3 @@ class PublicKeyFileTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(null, 'passPhrase', $auth);
     }
 }
- 

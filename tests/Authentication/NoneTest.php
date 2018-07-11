@@ -3,10 +3,12 @@
 
 namespace Ssh\Authentication;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @covers \Ssh\Authentication\None
  */
-class NoneTest extends \PHPUnit_Framework_TestCase
+class NoneTest extends TestCase
 {
     public function testClass() {
         $agent = new None('user');
@@ -15,4 +17,3 @@ class NoneTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals('user', 'username', $agent);
     }
 }
- 

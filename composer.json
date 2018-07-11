@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": "^7.1",
-        "ext-ssh2": "*"
+        "ext-ssh2": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0",

@@ -3,10 +3,12 @@
 
 namespace Ssh\Authentication;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @covers \Ssh\Authentication\HostBasedFile
  */
-class HostBasedFileTest extends \PHPUnit_Framework_TestCase
+class HostBasedFileTest extends TestCase
 {
     public function testClass() {
         $auth = new HostBasedFile('user', 'example.com', 'path/public.key', 'path/private.key', 'passPhrase', 'localUsername');
@@ -31,4 +33,3 @@ class HostBasedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(null, 'localUsername', $auth);
     }
 }
- 

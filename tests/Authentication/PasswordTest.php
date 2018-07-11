@@ -3,10 +3,12 @@
 
 namespace Ssh\Authentication;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @covers \Ssh\Authentication\Password
  */
-class PasswordTest extends \PHPUnit_Framework_TestCase
+class PasswordTest extends TestCase
 {
     public function testClass() {
         $pass = new Password('user', 'pass');
@@ -16,4 +18,3 @@ class PasswordTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals('pass', 'password', $pass);
     }
 }
- 
