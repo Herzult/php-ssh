@@ -1,21 +1,22 @@
 PHP SSH
 =======
 
-[![Build Status](https://travis-ci.org/Herzult/php-ssh.png?branch=master)](https://travis-ci.org/Herzult/php-ssh) (master)
+[![Build Status](https://travis-ci.org/lukanetconsult/php-ssh.png?branch=develop)](https://travis-ci.org/lukanetconsult/php-ssh) (develop)
 
-Provides an object-oriented wrapper for the php ssh2 extension.
+Provides an object-oriented wrapper for the php ssh2 extension. This is based on the work of
+[Antoine Hérault](https://github.com/Herzult/php-ssh).
 
 Requirements
 ------------
 
-You need PHP version 5.3+ with the [SSH2 extension](http://www.php.net/manual/en/book.ssh2.php).
+You need PHP version 7.1+ with the [SSH2 extension](http://www.php.net/manual/en/book.ssh2.php).
 
 Installation
 ------------
 
 The best way to add the library to your project is using [composer](http://getcomposer.org).
 
-    $ composer require herzult/php-ssh:~1.0
+    $ composer require lukanetconsult/php-ssh:^2.0
 
 Usage
 -----
@@ -29,13 +30,13 @@ For that, create a Configuration instance with all the needed parameters.
 <?php
 
 // simple configuration to connect "my-host"
-$configuration = new Ssh\Configuration('my-host');
+$configuration = new Ssh\HostConfiguration('my-host');
 ```
 
 The available configuration classes are:
 
-- `Configuration`
-- `SshConfigFileConfiguration`
+- `Ssh\HostConfiguration`
+- `Ssh\OpenSSH\ConfigFile`
 
 Both connection configuration and public/private key authentication can be obtained from a ssh config file such as `~/.ssh/config`
 
@@ -43,8 +44,8 @@ Both connection configuration and public/private key authentication can be obtai
 <?php
 
 // simple configuration to connect "my-host"
-$configuration = new Ssh\SshConfigFileConfiguration('/Users/username/.ssh/config', 'my-host');
-$authentication = $configuration->getAuthentication('optional_passphrase', 'optional_username');
+$configuration = Ssh\OpenSSH\ConfigFile::fromHostname('my-host', '~/.ssh/config');
+$authentication = $configuration->createAuthenticationMethod('optional_passphrase', 'optional_username');
 ```
 
 ### Create a session
@@ -53,9 +54,7 @@ The session is the central access point to the SSH functionality provided by the
 
 ```php
 <?php
-
 // ... the configuration creation
-
 $session = new Ssh\Session($configuration);
 ```
 
@@ -67,7 +66,7 @@ When you define an authentication for a session, it will authenticate on connect
 ```php
 <?php
 
-$configuration = new Ssh\Configuration('myhost');
+$configuration = new Ssh\HostConfiguration('myhost');
 $authentication = new Ssh\Authentication\Password('John', 's3cr3t');
 
 $session = new Session($configuration, $authentication);
@@ -81,19 +80,23 @@ The available authentication are:
  - `HostBasedFile` to authenticate using a public hostkey
  - `Agent` to authenticate using an ssh-agent
 
-### Authentication from SshConfigFileConfiguration
+### Authentication from `Ssh\OpenSSH\ConfigFile`
 
 If you use an ssh config file you can load your authentication and configuration from it as follows:
 
 ```php
 <?php
 
-$configuration = new Ssh\SshConfigFileConfiguration('~/.ssh/config', 'my-host');
-
-$session = new Session($configuration, $configuration->getAuthentication());
+$configuration = Ssh\OpenSSH\ConfigFile::fromHostname('my-host');
+$session = new Ssh\Session($configuration, $configuration->createAuthenticationMethod());
 ```
 
-This will pick up your public and private keys from your config file Host and Identity declarations.
+This will pick up the username, and your public and private keys from your config file Host and 
+Identity declarations.
+
+This simple snippet only works if the `User` declaration is also present, and the private key does
+not require a pass phrase. If any of this is not the case you have to pass the missing values to
+the `createAuthentication()` method.
 
 ### Subsystems
 
@@ -107,7 +110,6 @@ You can easily access the sftp subsystem of a session using the `getSftp()` meth
 <?php
 
 // the session creation
-
 $sftp = $session->getSftp();
 ```
 
@@ -121,10 +123,10 @@ The session also provides the `getPublickey()` method to access the publickey su
 <?php
 
 // ... the session creation
-
 $publickey = $session->getPublickey();
 ```
 
+The Public-Key subsystem allows you to provide multiple public keys to use for authentication.
 See the `Ssh\Publickey` class for more details on the available methods.
 
 #### Exec
@@ -136,9 +138,9 @@ The session provides the `getExec()` method to access the exec subsystem
 
 // ... the session creation
 
+/** @var Ssh\Session $session */
 $exec = $session->getExec();
-
-echo $exec->run('ls -lah');
+echo $exec->run('ls -lah')->getExitCode(), PHP_EOL;
 ```
 
 See the `Ssh\Exec` class for more details.
