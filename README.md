@@ -16,7 +16,7 @@ Installation
 
 The best way to add the library to your project is using [composer](http://getcomposer.org).
 
-    $ composer require lukanetconsult/php-ssh:^2.0
+    $ composer require luka/php-ssh:^2.0
 
 Usage
 -----
