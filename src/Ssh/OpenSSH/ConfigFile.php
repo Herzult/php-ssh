@@ -27,6 +27,11 @@ class ConfigFile
         $this->decoratedConfig = $this->findConfig($hostConfig);
     }
 
+    public static function fromHostname(string $hostname, string $file = self::DEFAULT_SSH_CONFIG): self
+    {
+        return new self(new HostConfiguration($hostname), $file);
+    }
+
     /**
      * Replaces '~/' with users home path
      */
