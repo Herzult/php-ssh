@@ -7,8 +7,10 @@
 
 namespace Ssh;
 
+use function fopen;
 use RuntimeException;
 use function stream_get_contents;
+use function tmpfile;
 
 final class ExecChannel
 {
@@ -37,7 +39,9 @@ final class ExecChannel
         stream_set_blocking($resource, true);
 
         $this->exitCode = $this->processStdout($resource);
-        $this->stderr = stream_copy_to_stream($stderr, $this->stderr);
+
+        $this->stderr = fopen('php://temp', 'w+');
+        stream_copy_to_stream($stderr, $this->stderr);
 
         fclose($stderr);
         fclose($resource);

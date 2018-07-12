@@ -88,6 +88,11 @@ class ConfigFile implements Configuration
         return $this->findConfig(new HostConfiguration($host));
     }
 
+    public function getUser(): ?string
+    {
+        return $this->decoratedConfig->getUser();
+    }
+
     /**
      * Return an authentication mechanism based on the configuration file
      * @return Authentication

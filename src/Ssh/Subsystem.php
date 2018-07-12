@@ -21,6 +21,11 @@ abstract class Subsystem extends AbstractResourceProvider
         $this->session = $session;
     }
 
+    protected function getSession(): Session
+    {
+        return $this->session;
+    }
+
     /**
      * Returns the SSH session resource
      *

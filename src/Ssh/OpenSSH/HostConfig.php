@@ -45,7 +45,7 @@ class HostConfig implements Configuration
         $this->privateKeyFile = $privateKeyFile;
     }
 
-    public function getUser(): string
+    public function getUser(): ?string
     {
         return $this->user;
     }

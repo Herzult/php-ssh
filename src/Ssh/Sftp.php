@@ -2,8 +2,12 @@
 
 namespace Ssh;
 
+use function file;
+use function file_exists;
 use Generator;
+use function ltrim;
 use RuntimeException;
+use Ssh\Exception\IOException;
 use function substr;
 
 /**
@@ -40,10 +44,11 @@ class Sftp extends Subsystem
     /**
      * Resolves the realpath of a provided path string
      */
-    public function realpath(string $filename): string
+    public function realpath(string $filename): ?string
     {
         // This function creates a not documented warning on failure.
-        return @ssh2_sftp_realpath($this->getResource(), $filename);
+        $result = @ssh2_sftp_realpath($this->getResource(), $filename);
+        return $result? : null;
     }
 
     /**
@@ -92,31 +97,53 @@ class Sftp extends Subsystem
      */
     public function exists(string $filename): bool
     {
-        return file_exists($this->buildUrl($filename));
+        $url = $this->buildUrl($filename);
+        $stat = @stat($url);
+
+        return ($stat !== false);
     }
 
     /**
      * Reads the content of the specified remote file.
      * Will return false if file does not exist.
      *
-     * @todo Throw exception on failure
-     * @return string|bool
+     * @throws RuntimeException
+     * @return string
      */
-    public function read(string $filename)
+    public function read(string $filename): string
     {
         // Suppress a warning, when file does not exist.
-        return @file_get_contents($this->buildUrl($filename));
+        $url = $this->buildUrl($filename);
+        $data = @file_get_contents($this->buildUrl($filename));
+
+        if ($data === false) {
+            throw IOException::readError(
+                $filename,
+                $this->getSession()->getConfiguration()->getHost()
+            );
+        }
+
+        return $data;
     }
 
     /**
      * Writes the given content to the specified remote file
      *
-     * @todo Throw exception on failure
-     * @return int|bool The number of bytes that were written into the file, or false on failure
+     * @throws IOException
+     * @return int The number of bytes that were written into the file
      */
-    public function write(string $filename, string $content)
+    public function write(string $filename, string $content): int
     {
-        return file_put_contents($this->buildUrl($filename), $content);
+        $bytes = file_put_contents($this->buildUrl($filename), $content);
+
+        if ($bytes === false) {
+            throw IOException::writeError(
+                $filename,
+                $this->getSession()->getConfiguration()->getHost()
+            );
+        }
+
+        return $bytes;
     }
 
     /**
@@ -141,7 +168,7 @@ class Sftp extends Subsystem
      */
     public function buildUrl(string $filename): string
     {
-        return 'ssh2.sftp://' . intval($this->getResource()) . '/' . $filename;
+        return 'ssh2.sftp://' . intval($this->getResource()) . '/' . ltrim($filename, '/');
     }
 
     /**
