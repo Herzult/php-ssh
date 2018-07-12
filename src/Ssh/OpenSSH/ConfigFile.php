@@ -17,7 +17,8 @@ class ConfigFile implements Configuration
 {
     use ConfigDecoratorTrait;
 
-    const DEFAULT_SSH_CONFIG = '~/.ssh/id_rsa';
+    const DEFAULT_SSH_CONFIG = '~/.ssh/config';
+    const DEFAULT_ID_FILE = '~/.ssh/id_rsa';
 
     private $data = [];
 
@@ -42,8 +43,8 @@ class ConfigFile implements Configuration
 
     private function prepareIdFile(?string $path): ?string
     {
-        if ($path === null) {
-            return $path;
+        if (($path === null) || ($path === '')) {
+            return null;
         }
 
         $path = $this->expandPath($path);
@@ -75,7 +76,7 @@ class ConfigFile implements Configuration
                 $config->getCallbacks()
             ),
             $result['user'] ?? null,
-            $this->prepareIdFile($result['identityfile'] ?? null)
+            $this->prepareIdFile($result['identityfile'] ?? self::DEFAULT_ID_FILE)
         );
     }
 
