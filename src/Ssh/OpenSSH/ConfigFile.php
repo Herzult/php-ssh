@@ -13,7 +13,7 @@ use Ssh\Authentication;
 use Ssh\Configuration;
 use Ssh\HostConfiguration;
 
-class ConfigFile
+class ConfigFile implements Configuration
 {
     use ConfigDecoratorTrait;
 
@@ -57,8 +57,8 @@ class ConfigFile
 
     private function findConfig(Configuration $config): HostConfig
     {
-        $matches = array_filter($this->data, function(array $config) use ($config): bool {
-            return fnmatch($config['host'], $config->getHost());
+        $matches = array_filter($this->data, function(array $configData) use ($config): bool {
+            return fnmatch($configData['host'], $config->getHost());
         });
 
         usort($matches, function (array $a, array $b): int {
