@@ -8,12 +8,14 @@
 namespace Ssh\Exception;
 
 use RuntimeException;
+use SimpleXMLElement;
 use function sprintf;
 
 class IOException extends RuntimeException implements ExceptionInterface
 {
     const READ_ERROR = 64;
     const WRITE_ERROR = 128;
+    const STDIO_ERROR = 256;
 
     public static function readError(string $filename, string $remoteHost = null): self
     {
@@ -35,5 +37,10 @@ class IOException extends RuntimeException implements ExceptionInterface
             sprintf($msg, $filename, $remoteHost),
             self::WRITE_ERROR
         );
+    }
+
+    public static function stdoutReadError(): self
+    {
+        return new self('Failure while reading from STDOUT', self::STDIO_ERROR);
     }
 }

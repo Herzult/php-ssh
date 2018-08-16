@@ -7,8 +7,10 @@
 
 namespace Ssh;
 
+use function feof;
 use function fopen;
 use RuntimeException;
+use Ssh\Exception\IOException;
 use function stream_get_contents;
 use function tmpfile;
 
@@ -77,6 +79,11 @@ final class ExecChannel
 
         while (!feof($stream)) {
             $line = fgets($stream);
+
+            if (($line === false) && !feof($stream)) {
+                throw IOException::stdoutReadError();
+            }
+
             fwrite($this->stdout, $line);
         }
 
