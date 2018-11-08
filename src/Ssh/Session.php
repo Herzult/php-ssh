@@ -96,6 +96,11 @@ class Session extends AbstractResourceProvider
         return $this->getSubsystem('exec');
     }
 
+    public function getTunnel() : Tunnel
+    {
+        return $this->getSubsystem('tunnel');
+    }
+
     /**
      * Returns the specified subsystem
      *
@@ -129,6 +134,10 @@ class Session extends AbstractResourceProvider
 
             case 'exec':
                 $subsystem = new Exec($this);
+                break;
+
+            case 'tunnel':
+                $subsystem = new Tunnel($this);
                 break;
 
             default:

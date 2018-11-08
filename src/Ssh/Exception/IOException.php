@@ -16,6 +16,7 @@ class IOException extends RuntimeException implements ExceptionInterface
     const READ_ERROR = 64;
     const WRITE_ERROR = 128;
     const STDIO_ERROR = 256;
+    const CONNECT_ERROR = 512;
 
     public static function readError(string $filename, string $remoteHost = null): self
     {
@@ -42,5 +43,13 @@ class IOException extends RuntimeException implements ExceptionInterface
     public static function stdoutReadError(): self
     {
         return new self('Failure while reading from STDOUT', self::STDIO_ERROR);
+    }
+
+    public static function tunnelError(string $host, int $port): self
+    {
+        return new self(
+            sprintf('Failed to create tcp tunnel to "%s:%d"', $host, $port),
+            self::CONNECT_ERROR
+        );
     }
 }

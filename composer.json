@@ -27,6 +27,7 @@
         "ext-ssh2": "^1.0"
     },
     "require-dev": {
+        "ext-sockets": "*",
         "phpunit/phpunit": "^7.0",
         "symfony/filesystem": "^4.0"
     },
