@@ -7,16 +7,12 @@
 
 namespace SshTest\FunctionalTests;
 
-use function assertInternalType;
+use PHPUnit\Framework\TestCase;
 use function fclose;
 use function feof;
 use function fread;
 use function fwrite;
 use function get_resource_type;
-use PHPUnit\Framework\TestCase;
-use function socket_close;
-use function stream_get_contents;
-use function stream_select;
 
 class TunnelTest extends TestCase
 {

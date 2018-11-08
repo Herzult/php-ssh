@@ -7,9 +7,9 @@
 
 namespace Ssh;
 
-use function is_resource;
 use RuntimeException;
 use Ssh\Exception\IOException;
+use function is_resource;
 use function ssh2_tunnel;
 
 final class Tunnel extends Subsystem
