@@ -12,7 +12,7 @@ use Ssh\Exception\IOException;
 use function is_resource;
 use function ssh2_tunnel;
 
-final class Tunnel extends Subsystem
+class Tunnel extends Subsystem
 {
     /**
      * Creates the underlying resource
