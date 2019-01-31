@@ -75,21 +75,22 @@ final class ExecChannel
     private function processStdout($stream): int
     {
         $this->stdout = fopen('php://temp', 'w+');
-        $line = '';
+        $lastLine = '';
 
         while (!feof($stream)) {
             $line = fgets($stream);
 
-            if (($line === false) && !feof($stream)) {
-                throw IOException::stdoutReadError();
+            if ($line === false) {
+                break;
             }
 
-            fwrite($this->stdout, $line);
+            $lastLine = $line;
+            fwrite($this->stdout, $lastLine);
         }
 
         $match = [];
 
-        if (!preg_match('/\[return_code:(\d+)?\]/', $line, $match)) {
+        if (!preg_match('/\[return_code:(\d+)?\]/', $lastLine, $match)) {
             throw new RuntimeException('Unexpected end of STDOUT stream');
         }
 
