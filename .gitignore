@@ -1,3 +1,4 @@
 vendor
 *.lock
 tests/bootstrap.php
+.idea
