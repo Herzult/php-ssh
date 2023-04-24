@@ -11,21 +11,16 @@ use RuntimeException;
  */
 abstract class AbstractResourceProvider implements ResourceHolder
 {
-    /**
-     * @var resource
-     */
-    protected $resource;
+    protected Resource|null $resource;
 
     /**
      * Returns the underlying resource. If the resource does not exist, it will
      * create it
-     *
-     * @return resource
      */
-    public function getResource()
+    public function getResource(): Resource
     {
-        if (!is_resource($this->resource)) {
-            $this->createResource();
+        if (!$this->resource) {
+            $this->resource = $this->createResource();
         }
 
         return $this->resource;
@@ -36,5 +31,5 @@ abstract class AbstractResourceProvider implements ResourceHolder
      *
      * @throws RuntimeException on resource creation failure
      */
-    abstract protected function createResource();
+    abstract protected function createResource(): Resource;
 }

@@ -10,16 +10,10 @@ use Ssh\Session;
  *
  * @author Cam Spiers <camspiers@gmail.com>
  */
-class Agent implements Authentication
+final readonly class Agent implements Authentication
 {
-    /**
-     * @var string
-     */
-    protected $username;
-
-    public function __construct(string $username)
+    public function __construct(public string $username)
     {
-        $this->username = $username;
     }
 
     /**

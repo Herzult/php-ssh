@@ -24,7 +24,7 @@ class SessionTest extends TestCase
      */
     private $configuration;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = $this->prophesize(Configuration::class);
     }

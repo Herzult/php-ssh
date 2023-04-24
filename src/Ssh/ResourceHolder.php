@@ -11,8 +11,6 @@ interface ResourceHolder
 {
     /**
      * Returns the underlying resource
-     *
-     * @return resource
      */
-    function getResource();
+    function getResource(): Resource;
 }
