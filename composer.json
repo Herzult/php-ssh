@@ -23,13 +23,13 @@
         }
     ],
     "require": {
-        "php": "^7.1",
+        "php": "^8.2",
         "ext-ssh2": "^1.0"
     },
     "require-dev": {
         "ext-sockets": "*",
-        "phpunit/phpunit": "^7.0",
-        "symfony/filesystem": "^4.0"
+        "phpunit/phpunit": "^10.0",
+        "symfony/filesystem": "^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -43,8 +43,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1.x-dev",
-            "dev-develop": "2.0.x-dev"
+            "dev-latest": "2.1.x-dev"
         }
     }
 }

@@ -1,8 +1,7 @@
 language: php
 
 php:
-  - 7.1
-  - 7.2
+  - 8.2
 
 before_script:
   - sudo apt-get update -qq
