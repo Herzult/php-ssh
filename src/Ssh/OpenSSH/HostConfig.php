@@ -45,8 +45,7 @@ final readonly class HostConfig implements Configuration, ProvidesAuthentication
         if ($this->keys && $this->keys->exists()) {
             return new Authentication\PublicKeyFile(
                 $user,
-                $this->keys->publicKeyFile,
-                $this->keys->privateKeyFile,
+                $this->keys,
                 $passphrase
             );
         } else if ($passphrase !== null && $passphrase !== '') {

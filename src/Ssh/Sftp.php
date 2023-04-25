@@ -26,9 +26,20 @@ class Sftp extends Subsystem
     /**
      * Creates a directory
      */
-    public function mkdir(string $dirname, int $mode = null, bool $recursive = false): bool
+    public function mkdir(string $dirname, int|null $mode = null, bool|null $recursive = false): bool
     {
-        return ssh2_sftp_mkdir($this->getResource()->resource, $dirname, $mode, $recursive);
+        /** @var array{mode?: int, recursive?: bool} */
+        $args = [];
+
+        if ($mode !== null) {
+            $args['mode'] = $mode;
+        }
+
+        if ($recursive !== null) {
+            $args['recursive'] = $recursive;
+        }
+
+        return ssh2_sftp_mkdir($this->getResource()->resource, $dirname, ...$args);
     }
 
     /**

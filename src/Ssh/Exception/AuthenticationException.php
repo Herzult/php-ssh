@@ -16,7 +16,7 @@ class AuthenticationException extends RuntimeException implements ExceptionInter
     public static function authenticationFailed(Session $session): self
     {
         return new self(
-            sprintf('Failed to authenticate to ssh host "%s"', $session->getConfiguration()->getHost()),
+            sprintf('Failed to authenticate to ssh host "%s"', $session->configuration->getHost()),
             self::AUTH_FAILED
         );
     }

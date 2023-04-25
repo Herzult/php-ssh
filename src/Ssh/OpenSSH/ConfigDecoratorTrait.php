@@ -46,7 +46,7 @@ trait ConfigDecoratorTrait
     }
 
     /**
-     * @return array{0: string, 1?: int, 2?: SSHMethodsArray, 3?: SSHCallbacksArray}
+     * @return array{host: string, port?: int, methods?: SSHMethodsArray, callbacks?: SSHCallbacksArray}
      */
     public function asArguments(): array
     {
