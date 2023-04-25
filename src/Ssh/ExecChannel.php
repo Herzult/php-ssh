@@ -7,46 +7,53 @@
 
 namespace Ssh;
 
+use RuntimeException;
+use Throwable;
+
+use function assert;
+use function fclose;
 use function feof;
 use function fopen;
-use RuntimeException;
-use Ssh\Exception\IOException;
+use function is_resource;
+use function stream_copy_to_stream;
 use function stream_get_contents;
-use function tmpfile;
+
 
 final class ExecChannel
 {
     /**
-     * @var resource
+     * @var resource|null
      */
-    private $stdout = null;
+    private mixed $stdout = null;
 
     /**
-     * @var resource
+     * @var resource|null
      */
-    private $stderr = null;
+    private mixed $stderr = null;
+
+    public readonly int $exitCode;
 
     /**
-     * @var int
+     * @param Resource $resource The ssh2_exec resource
      */
-    private $exitCode = null;
-
-    /**
-     * @param resource $resource The ssh2_exec resource
-     */
-    public function __construct($resource)
+    public function __construct(Resource $resource)
     {
+        $resource = $resource->resource;
         $stderr = ssh2_fetch_stream($resource, SSH2_STREAM_STDERR);
         stream_set_blocking($stderr, true);
         stream_set_blocking($resource, true);
 
-        $this->exitCode = $this->processStdout($resource);
-
-        $this->stderr = fopen('php://temp', 'w+');
-        stream_copy_to_stream($stderr, $this->stderr);
-
-        fclose($stderr);
-        fclose($resource);
+        try {
+            $this->exitCode = $this->processStdout($resource);
+            $this->stderr = fopen('php://temp', 'w+');
+            stream_copy_to_stream($stderr, $this->stderr);
+        } catch (Throwable $err) {
+            $this->closeStreams();
+            throw $err;
+        } finally {
+            fclose($stderr);
+            fclose($resource);
+        }
     }
 
     public function __destruct()
@@ -56,23 +63,26 @@ final class ExecChannel
 
     public function __toString(): string
     {
-        return stream_get_contents($this->stdout);
+        return $this->stdout ? stream_get_contents($this->stdout) : '';
     }
 
     private function closeStreams(): void
     {
-        if ($this->stdout) {
-            fclose($this->stdout);
-            $this->stdout = null;
-        }
+        $handles = [$this->stdout, $this->stderr];
+        $this->stdout = null;
+        $this->stderr = null;
 
-        if ($this->stderr) {
-            fclose($this->stderr);
-            $this->stderr = null;
+        foreach ($handles as $handle) {
+            if ($handle !== null) {
+                fclose($handle);
+            }
         }
     }
 
-    private function processStdout($stream): int
+    /**
+     * @param resource $stream
+     */
+    private function processStdout(mixed $stream): int
     {
         $this->stdout = fopen('php://temp', 'w+');
         $lastLine = '';
@@ -101,30 +111,21 @@ final class ExecChannel
         return (int)$match[1];
     }
 
-    public function getExitCode(): int
+    /**
+     * @return resource
+     */
+    public function stdout(): mixed
     {
-        return $this->exitCode;
+        assert(is_resource($this->stdout));
+        return $this->stdout;
     }
 
     /**
      * @return resource
      */
-    public function detachStdout()
+    public function stderr(): mixed
     {
-        $stream = $this->stdout;
-        $this->stdout = null;
-
-        return $stream;
-    }
-
-    /**
-     * @return resource
-     */
-    public function detachStderr()
-    {
-        $stream = $this->stderr;
-        $this->stderr = null;
-
-        return $stream;
+        assert(is_resource($this->stderr));
+        return $this->stderr;
     }
 }

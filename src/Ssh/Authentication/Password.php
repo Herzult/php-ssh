@@ -2,6 +2,7 @@
 
 namespace Ssh\Authentication;
 
+use SensitiveParameter;
 use Ssh\Authentication;
 use Ssh\Session;
 
@@ -10,22 +11,12 @@ use Ssh\Session;
  *
  * @author Antoine Hérault <antoine.herault@gmail.com>
  */
-class Password implements Authentication
+final readonly class Password implements Authentication
 {
-    /**
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * @var string
-     */
-    protected $password;
-
-    public function __construct(string $username, string $password)
-    {
-        $this->username = $username;
-        $this->password = $password;
+    public function __construct(
+        private string $username,
+        #[SensitiveParameter] private string $password,
+    ) {
     }
 
     /**
@@ -35,6 +26,6 @@ class Password implements Authentication
     {
         // This function generates a undocumented warning on authentification failure.
         // TODO: Check if shut-up is still needed with ext-ssh2 >= 1.x
-        return @ssh2_auth_password($session->getResource(), $this->username, $this->password);
+        return @ssh2_auth_password($session->getResource()->resource, $this->username, $this->password);
     }
 }

@@ -11,29 +11,19 @@ use Generator;
 use LogicException;
 use RecursiveIterator;
 
+/**
+ * @implements RecursiveIterator<string, SftpFileInfo>
+ */
 final class SftpDirectoryIterator implements RecursiveIterator
 {
-    /**
-     * @var Generator
-     */
-    private $items;
-    /**
-     * @var Sftp
-     */
-    private $sftp;
-    /**
-     * @var string
-     */
-    private $dirname;
+    private Generator $items;
 
-    public function __construct(Sftp $sftp, string $dirname)
+    public function __construct(private Sftp $sftp, string $dirname)
     {
         if (!$sftp->isDir($dirname)) {
             throw new LogicException(sprintf('"%s" is no directory', $dirname));
         }
 
-        $this->sftp = $sftp;
-        $this->dirname = $dirname;
         $this->items = $sftp->scanDirectory($dirname);
     }
 

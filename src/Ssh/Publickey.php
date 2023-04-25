@@ -1,45 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ssh;
 
 use RuntimeException;
 
+use function array_map;
+
 /**
  * Wrapper for the SSH publickey subsystem
- *
- * @author Antoine Hérault <antoine.herault@gmail.com>
  */
 class Publickey extends Subsystem
 {
     /**
      * Adds an authorized publickey
-     *
-     * @param  string  $algoname   The algorithm (e.g: ssh-dss, ssh-rsa)
-     * @param  string  $blob       The blob as binary data
-     * @param  Boolean $overwrite  Whether to overwrite the key if it already
-     *                             exist
-     * @param  array   $attributes An associative array of attributes to assign
-     *                             to the publickey. To mark an attribute as
-     *                             mandatory, precede its name with an asterisk.
-     *                             If the server is unable to support an
-     *                             attribute marked mandatory, it will abort
-     *                             the add process.
      */
-    public function add(string $algoname, string $blob, bool $overwrite = false, array $attributes = []): bool
+    public function add(PublicKeyEntry $key, bool $overwrite = false): bool
     {
-        return ssh2_publickey_add($this->getResource(), $algoname, $blob, $overwrite, $attributes);
+        return ssh2_publickey_add(
+            $this->getResource()->resource,
+            $key->algoName,
+            $key->data,
+            $overwrite,
+            $key->getAttributes()
+        );
     }
 
     /**
      * Lists the currently authorized publickeys
      *
-     * @return array A numerically indexed array of keys, each of which is an
-     *               associative array containing: name, blob, and attrs
-     *               elements.
+     * @return iterable<PublicKeyEntry>
      */
     public function getList(): iterable
     {
-        return ssh2_publickey_list($this->getResource());
+        return array_map(
+            static fn (array $item) => PublicKeyEntry::fromArray($item),
+            ssh2_publickey_list($this->getResource()->resource)
+        );
     }
 
     /**
@@ -48,22 +46,19 @@ class Publickey extends Subsystem
      * @param  string $algoname The algorithm (e.g: ssh-dss, ssh-rsa)
      * @param  string $blob     The blob as binary data
      */
-    public function remove(string $algoname, string $blob): bool
+    public function remove(PublicKeyEntry $key): bool
     {
-        return ssh2_publickey_remove($this->getResource(), $algoname, $blob);
+        return ssh2_publickey_remove($this->getResource()->resource, $key->algoName, $key->data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function createResource()
+    protected function createResource(): Resource
     {
-        $resource = ssh2_publickey_init($this->getSessionResource());
+        $resource = ssh2_publickey_init($this->getSessionResource()->resource);
 
         if (!is_resource($resource)) {
             throw new RuntimeException('The initialization of the publickey subsystem failed.');
         }
 
-        $this->resource = $resource;
+        return new Resource($resource);
     }
 }

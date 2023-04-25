@@ -7,29 +7,23 @@
 
 namespace Ssh;
 
-use RuntimeException;
 use Ssh\Exception\IOException;
+
 use function is_resource;
-use function ssh2_tunnel;
 
 class Tunnel extends Subsystem
 {
-    /**
-     * Creates the underlying resource
-     *
-     * @throws RuntimeException on resource creation failure
-     */
-    protected function createResource()
+    protected function createResource(): Resource
     {
-        $this->resource = $this->getSessionResource();
+        return $this->getSessionResource();
     }
 
     /**
      * @return resource The tunneled socket stream
      */
-    public function create(string $host, int $port)
+    public function create(string $host, int $port): mixed
     {
-        $tunnel = ssh2_tunnel($this->getResource(), $host, $port);
+        $tunnel = ssh2_tunnel($this->getResource()->resource, $host, $port);
 
         if (!is_resource($tunnel)) {
             throw IOException::tunnelError($host, $port);

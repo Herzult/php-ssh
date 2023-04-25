@@ -1,24 +1,23 @@
 <?php
-/**
- * @author    Axel Helmert <ah@luka.de>
- * @license   LUKA Proprietary
- * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
- */
+
+declare(strict_types=1);
 
 namespace Ssh\OpenSSH;
 
 use RuntimeException;
+
 use function array_map;
 use function explode;
 use function file;
+use function str_starts_with;
 use function strtolower;
 
-class Parser
+final class Parser
 {
-
     /**
      * Parses the ssh config file into an array of configs for later matching against hosts
-     * @param  string $file
+     *
+     * @return array<string, array<string, string>>
      */
     public function parse(string $file): array
     {
@@ -33,11 +32,11 @@ class Parser
         foreach ($lines as $lineNumber => $line) {
             $line = trim($line);
 
-            if ($line == '' || $line[0] == '#') {
+            if ($line == '' || str_starts_with($line, '#')) {
                 continue;
             }
 
-            $delimiter = (strpos($line, '=') !== false)? '=' : ' ';
+            $delimiter = (str_contains($line, '='))? '=' : ' ';
             $pair = explode($delimiter, $line, 2);
 
             if (count($pair) !== 2) {

@@ -11,7 +11,7 @@ use RuntimeException;
  */
 abstract class AbstractResourceProvider implements ResourceHolder
 {
-    protected Resource|null $resource;
+    protected Resource|null $resource = null;
 
     /**
      * Returns the underlying resource. If the resource does not exist, it will

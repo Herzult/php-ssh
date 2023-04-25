@@ -1,28 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ssh\Authentication;
 
 use Ssh\Authentication;
 use Ssh\Session;
 
-/**
- * Username based authentication
- *
- * @author Antoine Hérault <antoine.herault@gmail.com>
- */
-class None implements Authentication
+final readonly class None implements Authentication
 {
-    /**
-     * @var string
-     */
-    protected $username;
-
     /**
      * Constructor
      */
-    public function __construct(string $username)
+    public function __construct(private string $username)
     {
-        $this->username = $username;
     }
 
     /**
@@ -30,6 +21,6 @@ class None implements Authentication
      */
     public function authenticate(Session $session): bool
     {
-        return (true === ssh2_auth_none($session->getResource(), $this->username));
+        return ssh2_auth_none($session->getResource()->resource, $this->username) === true;
     }
 }

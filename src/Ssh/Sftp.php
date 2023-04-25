@@ -1,19 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ssh;
 
-use function file;
-use function file_exists;
 use Generator;
-use function ltrim;
 use RuntimeException;
 use Ssh\Exception\IOException;
-use function substr;
+
+use function ltrim;
 
 /**
  * Secure File Transfer Protocol
- *
- * @author Antoine Hérault <antoine.herault@gmail.com>
  */
 class Sftp extends Subsystem
 {
@@ -22,7 +20,7 @@ class Sftp extends Subsystem
      */
     public function lstat(string $path): array
     {
-        return ssh2_sftp_lstat($this->getResource(), $path);
+        return ssh2_sftp_lstat($this->getResource()->resource, $path);
     }
 
     /**
@@ -30,7 +28,7 @@ class Sftp extends Subsystem
      */
     public function mkdir(string $dirname, int $mode = null, bool $recursive = false): bool
     {
-        return ssh2_sftp_mkdir($this->getResource(), $dirname, $mode, $recursive);
+        return ssh2_sftp_mkdir($this->getResource()->resource, $dirname, $mode, $recursive);
     }
 
     /**
@@ -38,7 +36,7 @@ class Sftp extends Subsystem
      */
     public function readlink(string $link): string
     {
-        return ssh2_sftp_readlink($this->getResource(), $link);
+        return ssh2_sftp_readlink($this->getResource()->resource, $link);
     }
 
     /**
@@ -47,7 +45,7 @@ class Sftp extends Subsystem
     public function realpath(string $filename): ?string
     {
         // This function creates a not documented warning on failure.
-        $result = @ssh2_sftp_realpath($this->getResource(), $filename);
+        $result = @ssh2_sftp_realpath($this->getResource()->resource, $filename);
         return $result? : null;
     }
 
@@ -56,7 +54,7 @@ class Sftp extends Subsystem
      */
     public function rename(string $from, string $to): bool
     {
-        return ssh2_sftp_rename($this->getResource(), $from, $to);
+        return ssh2_sftp_rename($this->getResource()->resource, $from, $to);
     }
 
     /**
@@ -64,7 +62,7 @@ class Sftp extends Subsystem
      */
     public function rmdir(string $dirname): bool
     {
-        return ssh2_sftp_rmdir($this->getResource(), $dirname);
+        return ssh2_sftp_rmdir($this->getResource()->resource, $dirname);
     }
 
     /**
@@ -73,7 +71,7 @@ class Sftp extends Subsystem
     public function stat(string $path): array
     {
         // This function creates a undocumented warning on missing files.
-        return @ssh2_sftp_stat($this->getResource(), $path);
+        return @ssh2_sftp_stat($this->getResource()->resource, $path);
     }
 
     /**
@@ -81,7 +79,7 @@ class Sftp extends Subsystem
      */
     public function symlink(string $target, string $link): bool
     {
-        return ssh2_sftp_symlink($this->getResource(), $target, $link);
+        return ssh2_sftp_symlink($this->getResource()->resource, $target, $link);
     }
 
     /**
@@ -89,7 +87,7 @@ class Sftp extends Subsystem
      */
     public function unlink(string $filename): bool
     {
-        return ssh2_sftp_unlink($this->getResource(), $filename);
+        return ssh2_sftp_unlink($this->getResource()->resource, $filename);
     }
 
     /**
@@ -119,7 +117,7 @@ class Sftp extends Subsystem
         if ($data === false) {
             throw IOException::readError(
                 $filename,
-                $this->getSession()->getConfiguration()->getHost()
+                $this->session->configuration->getHost()
             );
         }
 
@@ -139,7 +137,7 @@ class Sftp extends Subsystem
         if ($bytes === false) {
             throw IOException::writeError(
                 $filename,
-                $this->getSession()->getConfiguration()->getHost()
+                $this->session->configuration->getHost()
             );
         }
 
@@ -156,10 +154,12 @@ class Sftp extends Subsystem
 
     /**
      * Sends the specified local file as the specified remote file
+     *
+     * @throws IOException
      */
-    public function send(string $local, string $distant): bool
+    public function send(string $local, string $distant): void
     {
-        return ($this->write($distant, file_get_contents($local)) !== false);
+        $this->write($distant, file_get_contents($local));
     }
 
     /**
@@ -168,26 +168,23 @@ class Sftp extends Subsystem
      */
     public function buildUrl(string $filename): string
     {
-        return 'ssh2.sftp://' . intval($this->getResource()) . '/' . ltrim($filename, '/');
+        return 'ssh2.sftp://' . intval($this->getResource()->resource) . '/' . ltrim($filename, '/');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function createResource()
+    protected function createResource(): Resource
     {
-        $resource = ssh2_sftp($this->getSessionResource());
+        $resource = ssh2_sftp($this->getSessionResource()->resource);
 
         if (!is_resource($resource)) {
             throw new RuntimeException('The initialization of the SFTP subsystem failed.');
         }
 
-        $this->resource = $resource;
+        return new Resource($resource);
     }
 
     public function isDir(string $path): bool
     {
-        if (substr($path, -1) !== '/') {
+        if (!str_ends_with($path, '/')) {
             $path .= '/';
         }
 

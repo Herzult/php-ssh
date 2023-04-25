@@ -1,21 +1,18 @@
 <?php
-/**
- * @author    Axel Helmert <ah@luka.de>
- * @license   LUKA Proprietary
- * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
- */
+
+declare(strict_types=1);
 
 namespace Ssh\OpenSSH;
 
 use Ssh\Configuration;
 
+/**
+ * @psalm-import-type SSHCallbacksArray from Configuration
+ * @psalm-import-type SSHMethodsArray from Configuration
+ */
 trait ConfigDecoratorTrait
 {
-    /**
-     * @var Configuration
-     */
-    private $decoratedConfig;
-
+    private Configuration $decoratedConfig;
 
     public function getHost(): string
     {
@@ -27,21 +24,30 @@ trait ConfigDecoratorTrait
         return $this->decoratedConfig->getPort();
     }
 
-    public function getIdentity(): ?string
+    public function getIdentity(): string | null
     {
         return $this->decoratedConfig->getIdentity();
     }
 
+    /**
+     * @return SSHMethodsArray
+     */
     public function getMethods(): array
     {
         return $this->decoratedConfig->getMethods();
     }
 
+    /**
+     * @return SSHCallbacksArray
+     */
     public function getCallbacks(): array
     {
-        $this->decoratedConfig->getCallbacks();
+        return $this->decoratedConfig->getCallbacks();
     }
 
+    /**
+     * @return array{0: string, 1?: int, 2?: SSHMethodsArray, 3?: SSHCallbacksArray}
+     */
     public function asArguments(): array
     {
         return $this->decoratedConfig->asArguments();

@@ -1,92 +1,58 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ssh\OpenSSH;
 
-use function array_filter;
-use function count;
-use function fnmatch;
-use IteratorAggregate;
-use RuntimeException;
 use Ssh\Authentication;
+use Ssh\Authentication\KeyPair;
 use Ssh\Configuration;
-use Ssh\HostConfiguration;
+use Ssh\ProvidesAuthentication;
+use UnexpectedValueException;
 
-/**
- * SSH Config File Configuration
- *
- * @author Cam Spiers <camspiers@gmail.com>
- * @author Axel Helmert <ah@luka.de>
- */
-class HostConfig implements Configuration
+use function file_exists;
+
+final readonly class HostConfig implements Configuration, ProvidesAuthentication
 {
     use ConfigDecoratorTrait;
 
-    const DEFAULT_SSH_CONFIG = '~/.ssh/id_rsa';
-
-    /**
-     * @var Configuration
-     */
-    private $hostConfig;
-
-    /**
-     * @var string
-     */
-    private $user;
-
-    /**
-     * @var string
-     */
-    private $privateKeyFile;
-
-    public function __construct(Configuration $hostConfig, string $user = null, string $privateKeyFile = null)
-    {
+    public function __construct(
+        Configuration $hostConfig,
+        private string|null $user = null,
+        private KeyPair|null $keys = null,
+    ) {
         $this->decoratedConfig = $hostConfig;
-        $this->user = $user;
-        $this->privateKeyFile = $privateKeyFile;
     }
 
-    public function getUser(): ?string
+    public function getUser(): string|null
     {
         return $this->user;
     }
 
-    public function getPrivateKeyFile(): ?string
+    public function getKeyPair(): KeyPair|null
     {
-        return $this->privateKeyFile;
+        return $this->keys;
     }
 
-    public function getPublicKeyFile(): ?string
-    {
-        if ($this->privateKeyFile === null) {
-            return null;
-        }
-
-        return $this->privateKeyFile . '.pub';
-    }
-
-    /**
-     * Return an authentication mechanism based on the configuration file
-     * @return Authentication
-     */
-    public function createAuthentication(string $passphrase = null, string $user = null): Authentication
+    public function createAuthentication(string|null $passphrase = null, string|null $user = null): Authentication
     {
         $user = $user ?? $this->user;
 
         if ($user === null) {
-            throw new RuntimeException("Can not authenticate for '{$this->getHost()}' could not find user to authenticate as");
+            throw new UnexpectedValueException("Can not authenticate for '{$this->getHost()}' could not find user to authenticate as");
         }
 
-        if ($this->privateKeyFile) {
+        if ($this->keys && $this->keys->exists()) {
             return new Authentication\PublicKeyFile(
                 $user,
-                $this->getPublicKeyFile(),
-                $this->getPrivateKeyFile(),
+                $this->keys->publicKeyFile,
+                $this->keys->privateKeyFile,
                 $passphrase
             );
+        } else if ($passphrase !== null && $passphrase !== '') {
+            return new Authentication\Password($user, $passphrase);
         } else {
-            return new Authentication\None(
-                $user
-            );
+            return new Authentication\None($user);
         }
     }
 }

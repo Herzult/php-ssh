@@ -1,24 +1,35 @@
 <?php
-/**
- * @author    Axel Helmert <ah@luka.de>
- * @license   LUKA Proprietary
- * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
- */
+
+declare(strict_types=1);
 
 namespace Ssh\Exception;
 
 use RuntimeException;
+use Ssh\Authentication\KeyPair;
 use Ssh\Session;
 
 class AuthenticationException extends RuntimeException implements ExceptionInterface
 {
-    const AUTH_FAILED = 2;
+    public const AUTH_FAILED = 2;
+    public const BAD_KEY_PAIR = 4;
 
     public static function authenticationFailed(Session $session): self
     {
         return new self(
             sprintf('Failed to authenticate to ssh host "%s"', $session->getConfiguration()->getHost()),
             self::AUTH_FAILED
+        );
+    }
+
+    public static function badKeyPair(KeyPair $keyPair): self
+    {
+        return new self(
+            sprintf(
+                'Unable to load key pair form "%s" and "%s"',
+                $keyPair->privateKeyFile,
+                $keyPair->publicKeyFile,
+            ),
+            self::BAD_KEY_PAIR
         );
     }
 }

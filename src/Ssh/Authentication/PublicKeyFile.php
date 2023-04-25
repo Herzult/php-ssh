@@ -1,55 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ssh\Authentication;
 
+use SensitiveParameter;
 use Ssh\Authentication;
 use Ssh\Session;
 
-/**
- * Public key file authentication
- *
- * @author Antoine Hérault <antoine.herault@gmail.com>
- */
-class PublicKeyFile implements Authentication
+final readonly class PublicKeyFile implements Authentication
 {
-    /**
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * @var string
-     */
-    protected $publicKeyFile;
-
-    /**
-     * @var string
-     */
-    protected $privateKeyFile;
-
-    /**
-     * @var null|string
-     */
-    protected $passPhrase;
-
-    /**
-     * Constructor
-     *
-     * @param  string $username       The authentication username
-     * @param  string $publicKeyFile  The path of the public key file
-     * @param  string $privateKeyFile The path of the private key file
-     * @param  string $passPhrase     An optional pass phrase for the key
-     */
     public function __construct(
-        string $username,
-        string $publicKeyFile,
-        string $privateKeyFile,
-        string $passPhrase = null
+        public string $username,
+        private KeyPair $keyPair,
+        #[SensitiveParameter] protected string|null $passPhrase = null
     ) {
-        $this->username = $username;
-        $this->publicKeyFile = $publicKeyFile;
-        $this->privateKeyFile = $privateKeyFile;
-        $this->passPhrase = $passPhrase;
     }
 
     /**
@@ -57,12 +22,18 @@ class PublicKeyFile implements Authentication
      */
     public function authenticate(Session $session): bool
     {
+        $args = [];
+
+        if ($this->passPhrase !== null) {
+            $args[] = $this->passPhrase;
+        }
+
         return ssh2_auth_pubkey_file(
-            $session->getResource(),
+            $session->getResource()->resource,
             $this->username,
-            $this->publicKeyFile,
-            $this->privateKeyFile,
-            $this->passPhrase
+            $this->keyPair->publicKeyFile,
+            $this->keyPair->privateKeyFile,
+            ...$args,
         );
     }
 }

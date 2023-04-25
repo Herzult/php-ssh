@@ -1,14 +1,11 @@
 <?php
-/**
- * @author    Axel Helmert <ah@luka.de>
- * @license   LUKA Proprietary
- * @copyright Copyright (c) 2018 LUKA netconsult GmbH (www.luka.de)
- */
+
+declare(strict_types=1);
 
 namespace Ssh\Exception;
 
 use RuntimeException;
-use SimpleXMLElement;
+
 use function sprintf;
 
 class IOException extends RuntimeException implements ExceptionInterface
@@ -18,24 +15,24 @@ class IOException extends RuntimeException implements ExceptionInterface
     const STDIO_ERROR = 256;
     const CONNECT_ERROR = 512;
 
-    public static function readError(string $filename, string $remoteHost = null): self
+    public static function readError(string $filename, string|null $remoteHost = null): self
     {
         $msg = 'Failed to read from file "%s"'
              . ($remoteHost? ' on remote host "%s"' : '');
 
         return new self(
-            sprintf($msg, $filename, $remoteHost),
+            sprintf($msg, $filename, $remoteHost ?? ''),
             self::READ_ERROR
         );
     }
 
-    public static function writeError(string $filename, string $remoteHost = null): self
+    public static function writeError(string $filename, string|null $remoteHost = null): self
     {
         $msg = 'Failed to write to file "%s"'
              . ($remoteHost? ' on remote host "%s"' : '');
 
         return new self(
-            sprintf($msg, $filename, $remoteHost),
+            sprintf($msg, $filename, $remoteHost ?? ''),
             self::WRITE_ERROR
         );
     }

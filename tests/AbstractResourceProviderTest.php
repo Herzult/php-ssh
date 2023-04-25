@@ -8,7 +8,9 @@
 namespace SshTest;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Ssh\AbstractResourceProvider;
+use Ssh\Resource;
 use SshTest\Fixtures\InvokableDummy;
 use function fopen;
 
@@ -17,6 +19,8 @@ use function fopen;
  */
 class AbstractResourceProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function createSubject(callable $provider): AbstractResourceProvider
     {
         return new class($provider) extends AbstractResourceProvider
@@ -31,33 +35,34 @@ class AbstractResourceProviderTest extends TestCase
                 $this->provider = $provider;
             }
 
-            protected function createResource()
+            protected function createResource(): Resource
             {
-                $this->resource = ($this->provider)();
+                return new Resource(($this->provider)());
             }
         };
     }
 
-    public function testResourceIsCreatedIfItDoesNotExist()
+    public function testResourceIsCreatedIfItDoesNotExist(): void
     {
         $expected = fopen('php://temp', 'w+');
-        $subject = $this->createSubject(function() use ($expected) { return $expected; });
+        $subject = $this->createSubject(static fn () => $expected);
 
-        self::assertSame($expected, $subject->getResource());
+        self::assertInstanceOf(Resource::class, $subject->getResource());
+        self::assertSame($expected, $subject->getResource()->resource);
     }
 
-    public function testResourceIsCreatedOnlyOnce()
+    public function testResourceIsCreatedOnlyOnce(): void
     {
         $provider = $this->prophesize(InvokableDummy::class);
         $provider->__call('__invoke', [])
             ->shouldBeCalledTimes(1)
-            ->will(function() {
+            ->will(function () {
                 return fopen('php://temp', 'w');
             });
 
         $subject = $this->createSubject($provider->reveal());
-
         $expected = $subject->getResource();
+
         $this->assertSame($expected, $subject->getResource());
     }
 }

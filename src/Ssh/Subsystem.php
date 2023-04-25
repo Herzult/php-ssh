@@ -2,8 +2,6 @@
 
 namespace Ssh;
 
-use RuntimeException;
-
 /**
  * Abstract class for the SSH subsystems as Sftp and Publickey
  *
@@ -11,27 +9,11 @@ use RuntimeException;
  */
 abstract class Subsystem extends AbstractResourceProvider
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
-    public function __construct(Session $session)
+    public function __construct(protected readonly Session $session)
     {
-        $this->session = $session;
     }
 
-    protected function getSession(): Session
-    {
-        return $this->session;
-    }
-
-    /**
-     * Returns the SSH session resource
-     *
-     * @return resource
-     */
-    protected function getSessionResource()
+    protected function getSessionResource(): Resource
     {
         return $this->session->getResource();
     }

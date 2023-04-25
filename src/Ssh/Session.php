@@ -1,46 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ssh;
 
-use InvalidArgumentException, RuntimeException;
-use function is_resource;
 use LogicException;
+use RuntimeException;
 use Ssh\Exception\AuthenticationException;
+
+use function is_resource;
 
 
 /**
  * SSH session
- *
- * @author Antoine Hérault <antoine.herault@gmail.com>
  */
 class Session extends AbstractResourceProvider
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private Sftp|null $sftp = null;
+    private Publickey|null $publickey = null;
+    private Exec|null $exec = null;
+    private Tunnel|null $tunnel = null;
 
-    /**
-     * @var Authentication
-     */
-    private $authentication;
-
-    /**
-     * @var Subsystem[]
-     */
-    private $subsystems;
-
-    /**
-     * Constructor
-     *
-     * @param  Configuration  A Configuration instance
-     * @param  Authentication An optional Authentication instance
-     */
-    public function __construct(Configuration $configuration, Authentication $authentication = null)
-    {
-        $this->configuration  = $configuration;
-        $this->authentication = $authentication;
-        $this->subsystems     = [];
+    public function __construct(
+        public readonly Configuration $configuration,
+        private Authentication|null $authentication = null
+    ) {
     }
 
     /**
@@ -50,101 +34,55 @@ class Session extends AbstractResourceProvider
      * an authentication attempt will be initiated.
      *
      * @throws LogicException When the session is already established with an authentication
-     * @throws AuthenticationException When the session ais established and the authentication attempt fails
+     * @throws AuthenticationException When the session is established and the authentication attempt fails
      */
-    public function setAuthentication(Authentication $authentication): void
+    public function authenticateWith(Authentication $authentication): void
     {
-        if (!is_resource($this->resource)) {
-            $this->authentication = $authentication;
-            return;
-        }
-
-        if ($this->authentication) {
+        if ($this->resource && $this->authentication) {
             throw new LogicException('Cannot re-authenticate an already established session');
         }
 
-        $this->authenticate($authentication);
+        $this->authentication = $authentication;
+
+        if ($this->resource) {
+            $this->authenticate();
+        }
     }
 
-    /**
-     * Returns the Sftp subsystem
-     *
-     * @return Sftp|Subsystem
-     */
-    public function getSftp(): Sftp
+    public function sftp(): Sftp
     {
-        return $this->getSubsystem('sftp');
-    }
-
-    /**
-     * Returns the Publickey subsystem
-     *
-     * @return Publickey|Subsystem
-     */
-    public function getPublickey(): Publickey
-    {
-        return $this->getSubsystem('publickey');
-    }
-
-    /**
-     * Returns the Exec subsystem
-     *
-     * @return Exec|Subsystem
-     */
-    public function getExec(): Exec
-    {
-        return $this->getSubsystem('exec');
-    }
-
-    public function getTunnel() : Tunnel
-    {
-        return $this->getSubsystem('tunnel');
-    }
-
-    /**
-     * Returns the specified subsystem
-     *
-     * If the subsystem does not exists, this method will attempt to create it
-     */
-    public function getSubsystem(string $name): Subsystem
-    {
-        if (!isset($this->subsystems[$name])) {
-            $this->createSubsystem($name);
+        if (!$this->sftp) {
+            $this->sftp = new Sftp($this);
         }
 
-        return $this->subsystems[$name];
+        return $this->sftp;
     }
 
-    /**
-     * Creates the specified subsystem
-     *
-     * @throws InvalidArgumentException if the specified subsystem is no
-     *                                  supported (e.g does not exist)
-     */
-    protected function createSubsystem(string $name): void
+    public function publickey(): Publickey
     {
-        switch ($name) {
-            case 'sftp':
-                $subsystem = new Sftp($this);
-                break;
-
-            case 'publickey':
-                $subsystem = new Publickey($this);
-                break;
-
-            case 'exec':
-                $subsystem = new Exec($this);
-                break;
-
-            case 'tunnel':
-                $subsystem = new Tunnel($this);
-                break;
-
-            default:
-                throw new InvalidArgumentException(sprintf('The subsystem \'%s\' is not supported.', $name));
+        if (!$this->publickey) {
+            $this->publickey = new Publickey($this);
         }
 
-        $this->subsystems[$name] = $subsystem;
+        return $this->publickey;
+    }
+
+    public function exec(): Exec
+    {
+        if (!$this->exec) {
+            $this->exec = new Exec($this);
+        }
+
+        return $this->exec;
+    }
+
+    public function tunnel() : Tunnel
+    {
+        if (!$this->tunnel) {
+            $this->tunnel = new Tunnel($this);
+        }
+
+        return $this->tunnel;
     }
 
     /**
@@ -154,27 +92,28 @@ class Session extends AbstractResourceProvider
      *
      * @throws RuntimeException if the connection fail
      */
-    protected function createResource(): void
+    protected function createResource(): Resource
     {
-        $this->resource = $this->connect($this->configuration->asArguments());
+        $resource = $this->connect();
 
-        if (!is_resource($this->resource)) {
+        if (!is_resource($resource)) {
             throw new RuntimeException('The SSH connection failed.');
         }
 
-        if ($this->authentication) {
-            $this->authenticate($this->authentication);
-        }
+        $this->resource = new Resource($resource);
+        $this->authenticate();
+
+        return $this->resource;
     }
 
     /**
      * Opens a connection with the remote server using the given arguments
      *
-     * @return resource
+     * @return resource|false
      */
-    private function connect(array $arguments)
+    private function connect(): mixed
     {
-        return @ssh2_connect(...$arguments);
+        return @ssh2_connect(...$this->configuration->asArguments());
     }
 
     /**
@@ -183,17 +122,10 @@ class Session extends AbstractResourceProvider
      *
      * @throws AuthenticationException
      */
-    private function authenticate(Authentication $authentication): void
+    private function authenticate(): void
     {
-        if (!$authentication->authenticate($this)) {
+        if ($this->authentication && !$this->authentication->authenticate($this)) {
             throw AuthenticationException::authenticationFailed($this);
         }
-
-        $this->authentication = $authentication;
-    }
-    
-    public function getConfiguration(): Configuration
-    {
-        return $this->configuration;
     }
 }
