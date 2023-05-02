@@ -4,32 +4,29 @@
 namespace Ssh\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Ssh\Authentication;
 
 /**
  * @covers \Ssh\Authentication\HostBasedFile
  */
 class HostBasedFileTest extends TestCase
 {
-    public function testClass() {
-        $auth = new HostBasedFile('user', 'example.com', 'path/public.key', 'path/private.key', 'passPhrase', 'localUsername');
-        $this->assertInstanceOf('\Ssh\Authentication', $auth);
+    public function testShouldConstructWithProperties(): void
+    {
+        $auth = new HostBasedFile(
+            'user',
+            'example.com',
+            new KeyPair('path/private.key', 'path/public.key'),
+            'passPhrase',
+            'localUsername'
+        );
 
-        $this->assertAttributeEquals('user', 'username', $auth);
-        $this->assertAttributeEquals('example.com', 'hostname', $auth);
-        $this->assertAttributeEquals('path/public.key', 'publicKeyFile', $auth);
-        $this->assertAttributeEquals('path/private.key', 'privateKeyFile', $auth);
-        $this->assertAttributeEquals('passPhrase', 'passPhrase', $auth);
-        $this->assertAttributeEquals('localUsername', 'localUsername', $auth);
-    }
+        $this->assertInstanceOf(Authentication::class, $auth);
 
-    public function testClassOptionals() {
-        $auth = new HostBasedFile('user', 'example.com', 'path/public.key', 'path/private.key');
-
-        $this->assertAttributeEquals('user', 'username', $auth);
-        $this->assertAttributeEquals('example.com', 'hostname', $auth);
-        $this->assertAttributeEquals('path/public.key', 'publicKeyFile', $auth);
-        $this->assertAttributeEquals('path/private.key', 'privateKeyFile', $auth);
-        $this->assertAttributeEquals(null, 'passPhrase', $auth);
-        $this->assertAttributeEquals(null, 'localUsername', $auth);
+        $this->assertSame('user', $auth->username);
+        $this->assertSame('example.com', $auth->hostname);
+        $this->assertSame('path/public.key', $auth->keyPair->publicKeyFile);
+        $this->assertSame('path/private.key', $auth->keyPair->privateKeyFile);
+        $this->assertSame('localUsername', $auth->localUsername);
     }
 }

@@ -12,7 +12,7 @@ use UnexpectedValueException;
 
 use function file_exists;
 
-final readonly class HostConfig implements Configuration, ProvidesAuthentication
+final class HostConfig implements Configuration, ProvidesAuthentication
 {
     use ConfigDecoratorTrait;
 

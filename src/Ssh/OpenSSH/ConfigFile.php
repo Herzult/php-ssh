@@ -10,7 +10,7 @@ use Ssh\Configuration;
 use Ssh\HostConfiguration;
 use Ssh\ProvidesAuthentication;
 
-final readonly class ConfigFile implements Configuration, ProvidesAuthentication
+final class ConfigFile implements Configuration, ProvidesAuthentication
 {
     use ConfigDecoratorTrait;
     use PathExpansion;
@@ -18,7 +18,7 @@ final readonly class ConfigFile implements Configuration, ProvidesAuthentication
     public const DEFAULT_SSH_CONFIG = '~/.ssh/config';
     public const DEFAULT_KEY_FILE = '~/.ssh/id_rsa';
 
-    private HostConfig $decoratedConfig;
+    private HostConfig $hostConfig;
 
     /**
      * @var array<string, array<string, string>>
@@ -28,7 +28,8 @@ final readonly class ConfigFile implements Configuration, ProvidesAuthentication
     public function __construct(Configuration $hostConfig, string $file = self::DEFAULT_SSH_CONFIG)
     {
         $this->data = (new Parser())->parse($this->expandPath($file));
-        $this->decoratedConfig = $this->findConfig($hostConfig);
+        $this->hostConfig = $this->findConfig($hostConfig);
+        $this->decoratedConfig = $this->hostConfig;
     }
 
     public static function forHostname(string $hostname, string $file = self::DEFAULT_SSH_CONFIG): self
@@ -77,11 +78,11 @@ final readonly class ConfigFile implements Configuration, ProvidesAuthentication
 
     public function getUser(): string|null
     {
-        return $this->decoratedConfig->getUser();
+        return $this->hostConfig->getUser();
     }
 
     public function createAuthentication(string|null $passphrase = null, string|null $user = null): Authentication
     {
-        return $this->decoratedConfig->createAuthentication($passphrase, $user);
+        return $this->hostConfig->createAuthentication($passphrase, $user);
     }
 }
