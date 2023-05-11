@@ -4,16 +4,18 @@
 namespace Ssh\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Ssh\Authentication;
 
 /**
  * @covers \Ssh\Authentication\None
  */
 class NoneTest extends TestCase
 {
-    public function testClass() {
+    public function testShouldPopulateUser(): void
+    {
         $agent = new None('user');
-        $this->assertInstanceOf('\Ssh\Authentication', $agent);
 
-        $this->assertAttributeEquals('user', 'username', $agent);
+        $this->assertInstanceOf(Authentication::class, $agent);
+        $this->assertSame('user', $agent->username);
     }
 }

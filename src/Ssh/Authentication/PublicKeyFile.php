@@ -8,11 +8,13 @@ use SensitiveParameter;
 use Ssh\Authentication;
 use Ssh\Session;
 
+use function ssh2_auth_pubkey_file;
+
 final readonly class PublicKeyFile implements Authentication
 {
     public function __construct(
         public string $username,
-        private KeyPair $keyPair,
+        private KeyPairOptions $keyPairs,
         #[SensitiveParameter] protected string|null $passPhrase = null
     ) {
     }
@@ -28,12 +30,20 @@ final readonly class PublicKeyFile implements Authentication
             $args[] = $this->passPhrase;
         }
 
-        return ssh2_auth_pubkey_file(
-            $session->getResource()->resource,
-            $this->username,
-            $this->keyPair->publicKeyFile,
-            $this->keyPair->privateKeyFile,
-            ...$args,
-        );
+        foreach ($this->keyPairs as $keyPair) {
+            $result = ssh2_auth_pubkey_file(
+                $session->getResource()->resource,
+                $this->username,
+                $keyPair->publicKeyFile,
+                $keyPair->privateKeyFile,
+                ...$args,
+            );
+
+            if ($result) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

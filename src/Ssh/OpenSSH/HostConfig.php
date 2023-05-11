@@ -6,6 +6,7 @@ namespace Ssh\OpenSSH;
 
 use Ssh\Authentication;
 use Ssh\Authentication\KeyPair;
+use Ssh\Authentication\KeyPairOptions;
 use Ssh\Configuration;
 use Ssh\ProvidesAuthentication;
 use UnexpectedValueException;
@@ -16,12 +17,15 @@ final class HostConfig implements Configuration, ProvidesAuthentication
 {
     use ConfigDecoratorTrait;
 
+    private KeyPairOptions $keys;
+
     public function __construct(
         Configuration $hostConfig,
         private string|null $user = null,
-        private KeyPair|null $keys = null,
+        KeyPairOptions|KeyPair|null $keys = null,
     ) {
         $this->decoratedConfig = $hostConfig;
+        $this->keys = $keys instanceof KeyPairOptions ? $keys : KeyPairOptions::fromKeyPair($keys);
     }
 
     public function getUser(): string|null
@@ -29,7 +33,7 @@ final class HostConfig implements Configuration, ProvidesAuthentication
         return $this->user;
     }
 
-    public function getKeyPair(): KeyPair|null
+    public function getKeyPair(): KeyPair|KeyPairOptions
     {
         return $this->keys;
     }
@@ -42,16 +46,23 @@ final class HostConfig implements Configuration, ProvidesAuthentication
             throw new UnexpectedValueException("Can not authenticate for '{$this->getHost()}' could not find user to authenticate as");
         }
 
-        if ($this->keys && $this->keys->exists()) {
-            return new Authentication\PublicKeyFile(
+        $authentication = null;
+
+        if ($this->keys->count()) {
+            $authentication = new Authentication\PublicKeyFile(
                 $user,
                 $this->keys,
                 $passphrase
             );
-        } else if ($passphrase !== null && $passphrase !== '') {
-            return new Authentication\Password($user, $passphrase);
-        } else {
-            return new Authentication\None($user);
         }
+
+        if ($passphrase !== null && $passphrase !== '') {
+            $authentication = Authentication\FallbackAggregate::aggregate(
+                new Authentication\Password($user, $passphrase),
+                $authentication,
+            );
+        }
+
+        return $authentication ?? new Authentication\None($user);
     }
 }

@@ -14,7 +14,7 @@ final readonly class KeyPair
         public string $privateKeyFile,
         string|null $publicKeyFile = null,
     ) {
-        $this->publicKeyFile = $publicKeyFile ?? ($privateKeyFile . 'pub');
+        $this->publicKeyFile = $publicKeyFile ?? ($privateKeyFile . '.pub');
     }
 
     public function exists(): bool

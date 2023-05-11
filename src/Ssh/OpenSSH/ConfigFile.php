@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ssh\OpenSSH;
 
 use Ssh\Authentication;
-use Ssh\Authentication\KeyPair;
 use Ssh\Configuration;
 use Ssh\HostConfiguration;
 use Ssh\ProvidesAuthentication;
@@ -37,13 +36,17 @@ final class ConfigFile implements Configuration, ProvidesAuthentication
         return new self(new HostConfiguration($hostname), $file);
     }
 
-    private function prepareIdFile(string $path): KeyPair|null
+    private function prepareIdFile(string|null $path): Authentication\KeyPairOptions
     {
         if ($path === '') {
-            return null;
+            $path = null;
         }
 
-        return new KeyPair($this->expandPath($path));
+        return Authentication\KeyPairOptions::fromFilename(
+            $path !== null
+                ? $this->expandPath($path)
+                : null
+        );
     }
 
     private function findConfig(Configuration $config): HostConfig
@@ -60,7 +63,7 @@ final class ConfigFile implements Configuration, ProvidesAuthentication
                 $config->getCallbacks()
             ),
             $result['user'] ?? null,
-            $this->prepareIdFile($result['identityfile'] ?? self::DEFAULT_KEY_FILE)
+            $this->prepareIdFile($result['identityfile'])
         );
     }
 

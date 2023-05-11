@@ -12,7 +12,7 @@ final readonly class None implements Authentication
     /**
      * Constructor
      */
-    public function __construct(private string $username)
+    public function __construct(public string $username)
     {
     }
 
